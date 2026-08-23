@@ -7,8 +7,9 @@ import { BackHandler, StyleSheet, Text, TouchableOpacity, View } from 'react-nat
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { T } from './src/theme';
-import { back, go, loadStore, useAppState, useScreen } from './src/store';
+import { actions, back, go, loadStore, useAppState, useScreen } from './src/store';
 import { handleNotificationResponse, rescheduleDaily } from './src/notify';
+import OnboardingScreen from './src/screens/OnboardingScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import DetailScreen from './src/screens/DetailScreen';
 import TreeScreen from './src/screens/TreeScreen';
@@ -57,12 +58,34 @@ export default function App() {
     return () => sub.remove();
   }, [screen]);
 
+  // 引导页中按返回键 = 跳过引导进入 App（可回退，不困住用户）
+  useEffect(() => {
+    if (appState.settings.onboarded) return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      actions.updateSettings({ onboarded: true });
+      return true;
+    });
+    return () => sub.remove();
+  }, [appState.settings.onboarded]);
+
   if (!ready) {
     return (
       <SafeAreaProvider>
         <View style={[styles.shell, { alignItems: 'center', justifyContent: 'center' }]}>
           <Text style={{ color: T.muted }}>加载中…</Text>
         </View>
+      </SafeAreaProvider>
+    );
+  }
+
+  // 未完成接入引导：全屏引导页（无底部导航，完成/跳过后进入正常界面）
+  if (!appState.settings.onboarded) {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.shell} edges={['top', 'bottom']}>
+          <StatusBar style="dark" />
+          <OnboardingScreen />
+        </SafeAreaView>
       </SafeAreaProvider>
     );
   }

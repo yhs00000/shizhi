@@ -73,6 +73,14 @@ export default function MeScreen({ onToast }: { onToast: (m: string) => void }) 
             autoCorrect={false}
             secureTextEntry
           />
+          <TouchableOpacity
+            style={{ marginTop: 10, alignSelf: 'flex-start' }}
+            onPress={() => actions.updateSettings({ onboarded: false })}
+          >
+            <Text style={{ color: T.greenM, fontSize: 12.5, fontWeight: '600' }}>
+              🔁 重新运行接入引导（含 Token 获取教程与验证）
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <View style={[s.set, shadow(1)]}>

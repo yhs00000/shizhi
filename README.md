@@ -1,128 +1,58 @@
-<div align="center">
+# 拾知
 
-# 拾知 ShiZhi 🌿
-
-**短视频知识碎片消化器 —— 专治「收藏了从不回看」**
-
-刷到知识视频，只需粘贴链接，AI 替你先看一遍；<br>
-每晚到点，把当天最值得回看的几条送到你手机主屏，其余静默入库、零打扰。
-
-![Expo](https://img.shields.io/badge/Expo-57.0-000000?logo=expo&logoColor=white)
-![React Native](https://img.shields.io/badge/React_Native-0.86-61DAFB?logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)
-![BibiGPT API](https://img.shields.io/badge/Powered_by-BibiGPT_API-2F5D4B)
-
-</div>
+“拾知”是一款短视频知识碎片消化器，专治“收藏了从不回看越堆越多”。享受奶头乐的中途，刷到知识视频只需粘贴链接，AI 即自动解析出核心要点，静默整理入库；每晚定点将当日最重要的 2 条精选推送到手机主屏，其余内容零打扰。
 
 ---
 
-## 🕳️ 为什么做拾知
+# BibiGPT API 最小闭环 Demo 包
 
-我们刷到有价值的知识视频，当下没空看，就顺手存进收藏夹、转给文件传输助手——然后，再也没有然后了。
+黑客松用：[BibiGPT 开放 API](https://docs.bibigpt.co/api-reference/introduction)（beta）的接入示例，
+已实现并真实验证三个接口：**查额度 / 链接总结 / 字幕抓取**。Python 与 TypeScript 两个版本功能完全一致。
 
-数据显示，收藏内容的回看率**不到 5%**。收藏完成的不是学习，是心理安慰：收藏夹是一个没有提醒、没有整理的黑洞。
-
-拾知补上「存得进 → 看得懂 → 记得回」这一环：**不只替你存，更替你消化**。
-
-## ⚙️ 它是怎么工作的
-
-```mermaid
-flowchart TD
-    A[📱 刷到知识视频] --> B[📋 复制分享链接]
-    B --> C[📥 粘贴进拾知<br/>短链自动展开]
-    C --> D[🤖 AI 解析生成知识卡<br/>标题+一句话精华+核心要点]
-    D --> E[(🗄️ 个人知识库<br/>内容去重·静默沉淀)]
-    E --> F[🌙 晚间精选推送<br/>当日最值得回看的几条]
-    F --> G[👁️ 复习页·当日卡片流]
-    G --> H[✅ 确认消化]
-    H --> I[🌳 知识网络生长<br/>挂上领域枝干·跨域关联浮现]
-    I -.->|每晚回到知识库<br/>温故·发现新关联| E
-    I -.->|次日继续刷、继续存<br/>日复一日，网络越长越大| A
-    style E fill:#2F5D4B,color:#fff
-    style I fill:#2F5D4B,color:#fff
-```
-
-**实线**是单条知识的消化动线：粘贴是用户唯一动作，解析、挑选、归类全自动。
-**虚线**是每日循环：回到知识库温故、发现新旧知识的关联，以及次日继续收集——知识网络因此越长越密。
-
-## ✨ 核心功能
-
-| 功能 | 说明 |
-| --- | --- |
-| 🔗 一键导入 | 粘贴链接即可；B站 / 抖音 / 小红书 / YouTube / 微博短链自动展开 |
-| 🤖 AI 知识卡 | 三种生成模式：**智能卡**（单次请求直出卡片）、**简洁卡**（默认总结+本地解析）、**精制卡**（两步请求精修），产出标题+一句话精华+核心要点 |
-| 🚫 内容去重 | 按 BV 号 / YouTube ID / 规范化 URL 识别同一内容，重复导入自动拦截，不浪费 API 额度 |
-| 🌙 晚间精选推送 | 每晚从当日新增中挑选约 20%（至少 1 条）最值得回看的知识，默认 21:00 推送、时间可自定义；没上屏的不打扰，全在 App 里等你 |
-| 🌳 知识树 | 复习确认后知识点才挂上树——存进树里的，都是真正消化过的 |
-| 📅 打卡日历 | 完成当日回顾即打卡，按月圆点展示 |
-| 💰 额度管理 | 「我的」页直接查询 BibiGPT 账号余额、测试推送 |
-
-## 📁 仓库结构
+## 目录结构
 
 ```
-shizhi/
-├── mobile/       # 拾知 App（Expo + React Native，iOS / Android）
-│   └── src/
-│       ├── screens/   # 首页 / 详情 / 复习 / 知识树 / 我的 / 打卡日历
-│       ├── api.ts     # BibiGPT 开放 API 封装（短链展开/三种卡片模式）
-│       ├── notify.ts  # 晚间精选推送（expo-notifications）
-│       ├── store.ts   # 全局状态 + AsyncStorage 持久化
-│       └── card.ts    # 知识卡生成与解析
-├── typescript/   # BibiGPT API 最小闭环 Demo（CLI：查余额/总结/抓字幕）
-├── python/       # 预留
-└── docs/         # 预留
+bibigpt-pack/
+├── README.md
+├── docs/
+│   └── bibigpt_openapi.json      # 官方 OpenAPI 规范（全部 40 个端点，本地参考）
+├── mobile/                       # 拾知 App（React Native / Expo）
+├── python/
+│   └── bibigpt_demo.py           # Python 版（依赖：requests）
+└── typescript/
+    └── ...                       # TypeScript 版
 ```
 
-## 🚀 快速开始
+---
 
-### 准备：获取 API Token
+## App 打包与更新（EAS）
 
-1. 打开 [bibigpt.co/user/integration](https://bibigpt.co/user/integration) 注册并获取 API Token
+### 架构说明
 
-### 手机 App（mobile/）
+App 为「云端 API + 本地存储」架构：AI 解析走 BibiGPT 云端 API，卡片数据存手机本地 AsyncStorage，每日精选推送为手机本地定时通知。**无需自建后端服务器**，打包成独立 APK 后即可离线日常使用。
+
+### 首次构建 preview 安装包（可独立运行）
 
 ```bash
 cd mobile
-npm install
-npx expo start
+npx eas-cli build --platform android --profile preview
 ```
 
-- 首次启动后在「我的」页填入你的 BibiGPT API Token
-- 基础功能可在 Expo Go 中体验；**晚间推送需开发构建**（SDK 53+ 的 Expo Go 不含 expo-notifications 原生实现）：
+- 构建在 EAS 云端完成（约 15-30 分钟），完成后得到 APK 下载链接，发手机安装即可
+- 与开发用的 dev-client 包区别：preview 包把 JS 代码打进包内，电脑关机也能用
+- 配置位于 `app.json`（runtimeVersion + updates.url）与 `eas.json`（preview channel）
+
+### 日常更新（EAS Update 热更新）
+
+改了 JS/TS 代码后（无需重装 APK）：
 
 ```bash
-npx expo run:android   # 或 npx expo run:ios
+cd mobile
+npx eas-cli update --branch preview --message "更新说明"
 ```
 
-### API 命令行 Demo（typescript/）
+手机上的 App 下次打开时自动拉取新包。仅当改动涉及原生依赖/权限/图标等时，才需要重新 `eas build`。
 
-```bash
-export BIBIGPT_API_TOKEN=你的token   # Windows: set BIBIGPT_API_TOKEN=你的token
-cd typescript
-npm install
-npm start
-```
+### 新手引导
 
-交互式菜单支持：① 查询账号额度 ② 链接总结（B站/YouTube/文件直链）③ 字幕抓取。Node 18+ 即可运行，零第三方运行时依赖。
-
-## 🛠️ 技术栈
-
-- **App**：Expo 57 · React Native 0.86 · React 19 · TypeScript · AsyncStorage · expo-notifications
-- **AI 能力**：[BibiGPT 开放 API](https://bibigpt.co)（视频总结 / 字幕抓取 / 短链展开 / 自定义 Prompt）
-- **Demo**：Node 18+ 原生 fetch，tsx 直跑 TypeScript
-
-## 🗺️ 路线图
-
-| 版本 | 主题 | 内容 |
-| --- | --- | --- |
-| **V1 · 当前** | 最短消化闭环 | 链接导入 + AI 知识卡 + 知识库 + 晚间精选推送 ✅ |
-| V2 | 知识体系 | 知识树网状可视化、桌面小组件 |
-| V3 | 知识飞轮 | AI 读取个人知识库 + 博主过往文案风格，辅助选题与初稿——一个越用越懂你的「AI 替身」 |
-
-> 普通用户用拾知攒习惯，重度创作者用拾知攒弹药：**刷到 → 存进 → 长成库 → 写出来**，这就是拾知的知识飞轮。
-
-## 🙏 致谢
-
-- [BibiGPT 开放 API](https://bibigpt.co) —— 视频解析与总结能力
-- 本项目为黑客松参赛作品（2026.08）
-
+首次打开 App 会强制进入 BibiGPT Token 接入引导（获取→粘贴→/v1/me 验证→进入），可跳过或按返回键回退；「我的」页可随时重新运行引导。

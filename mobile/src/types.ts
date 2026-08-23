@@ -26,6 +26,7 @@ export interface Settings {
   cardMode: CardMode;
   remindEnabled: boolean;
   remindTime: string; // "HH:MM"
+  onboarded: boolean; // 是否已完成首次接入引导
 }
 
 export interface AppState {
@@ -41,6 +42,7 @@ export const DEFAULT_SETTINGS: Settings = {
   cardMode: 1,
   remindEnabled: true,
   remindTime: '21:00',
+  onboarded: false,
 };
 
 export const todayStr = (d = new Date()) =>
