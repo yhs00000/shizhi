@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>拾知 · 短视频知识碎片消化器 —— 交互演示</title>
+<style>
+/* ==========================================================================
+   设计令牌 —— 取自「拾知」App（马蒂斯绿世界：绿系主导 + 金黄点睛）
+   ========================================================================== */
+:root{
+  --green-d:#0e4a3c; --green-m:#1f7a5e; --green-l:#2f8f76; --teal-l:#c3dfd8;
+  --gold:#d99a1f; --gold-l:#f3dca0;
+  --surface:#ffffff; --bg:#eef4f1; --bg-2:#e4efe9; --line:#dce8e2;
+  --ink:#16302a; --ink-soft:#33514a; --muted:#6b7d76;
+  --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:26px;
+  --e1:0 1px 3px rgba(14,74,60,.10),0 1px 2px rgba(14,74,60,.06);
+  --e2:0 3px 8px rgba(14,74,60,.10),0 2px 4px rgba(14,74,60,.05);
+  --e4:0 8px 20px rgba(14,74,60,.12),0 3px 6px rgba(14,74,60,.06);
+  --e6:0 16px 36px rgba(14,74,60,.16),0 5px 10px rgba(14,74,60,.08);
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:"Roboto","PingFang SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  color:var(--ink); background:var(--bg); overflow-x:hidden; line-height:1.6;
+}
+
+/* ==========================================================================
+   页面级（落地页）
+   ========================================================================== */
+.topnav{
+  position:sticky; top:0; z-index:100; height:58px; background:rgba(255,255,255,.86);
+  backdrop-filter:saturate(1.4) blur(12px); border-bottom:1px solid var(--line);
+  display:flex; align-items:center; padding:0 24px; gap:20px;
+}
+.topnav .logo{display:flex; align-items:center; gap:9px; font-weight:800; font-size:17px; color:var(--green-d);}
+.topnav .logo .mark{width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,var(--green-m),var(--green-d));
+  color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:var(--e2);}
+.topnav .links{margin-left:auto; display:flex; gap:4px;}
+.topnav .links a{text-decoration:none; color:var(--ink-soft); font-size:13.5px; font-weight:600; padding:7px 13px; border-radius:9px; transition:.16s;}
+.topnav .links a:hover{background:var(--bg-2); color:var(--green-m);}
+
+.hero{
+  position:relative; padding:72px 24px 120px; text-align:center; color:#fff; overflow:hidden;
+  background:radial-gradient(900px 480px at 20% -10%, rgba(47,143,118,.55), transparent 60%),
+             radial-gradient(760px 420px at 85% 0%, rgba(217,154,31,.28), transparent 55%),
+             linear-gradient(160deg,#0c2f27 0%, #0e4a3c 48%, #17544a 100%);
+}
+.hero::after{content:""; position:absolute; left:0; right:0; bottom:0; height:110px;
+  background:linear-gradient(180deg,transparent, var(--bg));}
+.hero .kicker{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700;
+  color:#cfe6dd; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16);
+  padding:6px 14px; border-radius:20px; margin-bottom:22px; letter-spacing:.3px;}
+.hero .kicker .dot{width:7px; height:7px; border-radius:50%; background:var(--gold); box-shadow:0 0 0 4px rgba(217,154,31,.25);}
+.hero h1{font-size:56px; font-weight:900; letter-spacing:2px; line-height:1.05;}
+.hero h1 em{font-style:normal; color:var(--gold-l);}
+.hero .tagline{font-size:19px; font-weight:700; margin-top:14px; color:#eaf4ef; letter-spacing:1px;}
+.hero .pitch{max-width:640px; margin:18px auto 0; font-size:15px; color:#bcd6cc; line-height:1.9;}
+.hero .cta{margin-top:30px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;}
+.hero .cta a{text-decoration:none;}
+.btn-hero{display:inline-block; padding:14px 30px; border-radius:14px; font-weight:800; font-size:15px;
+  background:var(--gold); color:#3a2707; box-shadow:var(--e4); transition:.18s var(--ease);}
+.btn-hero:hover{transform:translateY(-2px); box-shadow:var(--e6);}
+.btn-ghost{display:inline-block; padding:14px 28px; border-radius:14px; font-weight:700; font-size:15px;
+  color:#fff; border:1.4px solid rgba(255,255,255,.35); transition:.18s var(--ease);}
+.btn-ghost:hover{background:rgba(255,255,255,.08);}
+.hero .badges{margin-top:34px; display:flex; gap:9px; justify-content:center; flex-wrap:wrap; position:relative; z-index:1;}
+.badge{font-size:12.5px; font-weight:700; color:#dcece6; background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.16); padding:6px 13px; border-radius:20px;}
+
+.wrap{max-width:1120px; margin:0 auto; padding:0 24px;}
+.section{padding:72px 0 8px;}
+.sec-head{text-align:center; margin-bottom:44px;}
+.sec-head .eyebrow{font-size:12.5px; font-weight:800; letter-spacing:2px; color:var(--gold); text-transform:uppercase;}
+.sec-head h2{font-size:34px; font-weight:900; color:var(--green-d); margin-top:6px;}
+.sec-head p{font-size:15px; color:var(--muted); margin-top:12px; max-width:600px; margin-left:auto; margin-right:auto;}
+
+/* ---- 演示区：手机居中 ---- */
+.demo-section{background:linear-gradient(180deg,var(--bg) 0%, #e2efe9 100%); padding:64px 0 84px;}
+.demo-grid{display:flex; align-items:center; justify-content:center; gap:56px; flex-wrap:wrap;}
+.demo-copy{max-width:330px;}
+.demo-copy h3{font-size:24px; font-weight:900; color:var(--green-d); line-height:1.3;}
+.demo-copy p{font-size:14px; color:var(--ink-soft); margin-top:14px; line-height:1.9;}
+.demo-copy ul{list-style:none; margin-top:20px; display:flex; flex-direction:column; gap:11px;}
+.demo-copy li{font-size:13.5px; color:var(--ink-soft); display:flex; gap:10px; align-items:flex-start;}
+.demo-copy li b{color:var(--green-m); font-weight:800;}
+.demo-copy .num{flex:0 0 auto; width:22px; height:22px; border-radius:7px; background:var(--green-m); color:#fff;
+  font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px;}
+
+/* ---- 手机外壳 ---- */
+.phone{width:392px; max-width:100%; height:820px; position:relative; flex:0 0 auto;
+  border-radius:34px; background:#0c1f1a; padding:9px;
+  box-shadow:0 30px 70px rgba(14,74,60,.30),0 8px 20px rgba(0,0,0,.18),inset 0 0 0 2px #15392e;}
+.screen{width:100%; height:100%; background:var(--bg); border-radius:26px; overflow:hidden; position:relative;
+  display:flex; flex-direction:column; box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);}
+.punch{position:absolute; top:11px; left:50%; transform:translateX(-50%); width:11px; height:11px;
+  border-radius:50%; background:#05120e; z-index:60; box-shadow:inset 0 0 0 1px #000;}
+.status{height:26px; flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
+  padding:0 22px; font-size:12px; font-weight:600; color:var(--ink); background:var(--surface);}
+.status .ic{display:flex; align-items:center; gap:5px;}
+
+/* ---- App 内部通用 ---- */
+.appbar{height:56px; flex:0 0 auto; background:var(--surface); display:flex; align-items:center;
+  padding:0 12px; gap:6px; box-shadow:var(--e1); position:relative; z-index:20;}
+.appbar .title{font-size:19px; font-weight:800; letter-spacing:.3px; color:var(--ink);}
+.appbar .sub{font-size:12px; color:var(--muted); font-weight:500;}
+.appbar .spacer{flex:1;}
+.appbar .title.sm{font-size:16px;}
+.icon-btn{width:40px; height:40px; border-radius:50%; border:none; background:transparent; color:var(--ink);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; transition:.15s; font-size:22px;}
+.icon-btn:active{background:rgba(31,122,94,.12);}
+.back{width:38px; height:38px; border:none; background:transparent; color:var(--ink); font-size:26px; line-height:1;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:inherit;}
+
+.scroll{flex:1 1 auto; overflow-y:auto; overflow-x:hidden; position:relative;}
+.scroll::-webkit-scrollbar{width:0;}
+.pad{padding:16px 16px 92px;}
+
+/* ---- 首页 ---- */
+#v-home{height:100%; display:flex; flex-direction:column; overflow:hidden;}
+.home-body{flex:1 1 auto; overflow-y:auto; padding:14px 14px 92px;}
+.home-body::-webkit-scrollbar{width:0;}
+.hero-card{background:var(--surface); border-radius:var(--r-lg); padding:15px 16px; box-shadow:var(--e2); position:relative; overflow:hidden;}
+.hero-card h3{font-size:16px; font-weight:800; color:var(--ink); margin-bottom:3px;}
+.hero-card p{font-size:12.5px; color:var(--muted); line-height:1.5; margin-bottom:11px;}
+.linkbox{background:var(--bg-2); border:1.4px dashed var(--teal-l); border-radius:12px; padding:9px 11px;
+  font-size:12px; color:var(--ink-soft); min-height:38px; display:flex; align-items:center; word-break:break-all; margin-bottom:11px;}
+.btn{border:none; border-radius:12px; padding:12px 16px; font-size:14px; font-weight:700; cursor:pointer;
+  font-family:inherit; transition:.16s var(--ease); position:relative; overflow:hidden;}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--green-m); color:#fff; width:100%; box-shadow:var(--e2);}
+.btn-primary:hover{background:var(--green-l);}
+.btn-primary:disabled{background:var(--bg-2); color:var(--muted); box-shadow:none; cursor:default;}
+.btn-line{background:transparent; color:var(--green-m); border:1.4px solid var(--teal-l); width:100%;}
+.stats{display:flex; gap:10px; margin-top:12px;}
+.chip{flex:1; background:var(--surface); border-radius:var(--r-md); padding:11px 8px; text-align:center; box-shadow:var(--e1);}
+.chip .n{font-size:18px; font-weight:800; color:var(--green-m); line-height:1;}
+.chip .l{font-size:11px; color:var(--muted); margin-top:4px;}
+.sec{font-size:13px; font-weight:800; color:var(--ink); margin:14px 2px 9px; display:flex; align-items:center; gap:8px;}
+.sec::before{content:""; width:4px; height:15px; border-radius:3px; background:var(--gold);}
+.mini{display:flex; align-items:center; gap:11px; background:var(--surface); border:none; border-radius:var(--r-md);
+  padding:10px 12px; box-shadow:var(--e1); margin-bottom:9px; cursor:pointer; transition:.16s; width:100%; text-align:left; font-family:inherit;}
+.mini:active{transform:scale(.99);}
+.mini .cov{width:42px; height:42px; border-radius:11px; color:#fff; flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center; font-size:19px; box-shadow:var(--e1);}
+.mini .body{flex:1; min-width:0;}
+.mini .t{font-size:13.5px; font-weight:700; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.mini .sub{font-size:11px; color:var(--muted); margin-top:2px;}
+.tag{font-size:10.5px; padding:2px 8px; border-radius:8px; font-weight:700; white-space:nowrap; flex:0 0 auto;}
+.tag.gold{background:var(--gold); color:#fff;}
+.tag.muted{background:transparent; border:1px solid var(--line); color:var(--muted);}
+.empty{text-align:center; color:var(--muted); font-size:12.5px; margin:24px 0;}
+
+/* ---- 详情 ---- */
+.detail .cov{height:150px; border-radius:var(--r-lg); color:#fff; padding:16px;
+  display:flex; flex-direction:column; justify-content:flex-end; box-shadow:var(--e2); position:relative; overflow:hidden;}
+.detail .cov::after{content:""; position:absolute; inset:0; background:radial-gradient(300px 200px at 80% 0%, rgba(255,255,255,.14), transparent 60%);}
+.detail .cov .play{position:absolute; right:16px; top:16px; width:44px; height:44px; border-radius:50%; background:rgba(217,154,31,.92);
+  display:flex; align-items:center; justify-content:center; box-shadow:var(--e2); z-index:2;}
+.detail .cov .emj{position:absolute; left:16px; top:16px; font-size:26px; z-index:2;}
+.detail .cov h4{font-size:17px; font-weight:900; margin-bottom:4px; position:relative; z-index:1;}
+.detail .cov .meta{font-size:12px; color:#cfe6dd; position:relative; z-index:1;}
+.verdict{display:flex; align-items:center; gap:8px; background:rgba(217,154,31,.10); border:1px solid rgba(217,154,31,.4);
+  border-radius:var(--r-md); padding:10px 12px; margin:14px 0;}
+.verdict.ok{background:rgba(47,143,118,.08); border-color:rgba(47,143,118,.35);}
+.verdict .vb{font-size:12px; font-weight:800; color:var(--gold); flex:0 0 auto;}
+.verdict.ok .vb{color:var(--green-m);}
+.verdict .vt{font-size:12.5px; color:var(--ink-soft); line-height:1.45;}
+.card{background:var(--surface); border-radius:var(--r-lg); padding:15px 16px; box-shadow:var(--e1); margin-bottom:13px;}
+.card .ct{font-size:13px; font-weight:800; color:var(--ink); margin-bottom:8px; display:flex; align-items:center; gap:7px;}
+.card .ct::before{content:""; width:4px; height:14px; border-radius:3px; background:var(--green-m); flex:0 0 auto;}
+.card .ct.g::before{background:var(--gold);}
+.tl{font-size:13.5px; color:var(--ink-soft); line-height:1.85; word-break:break-word;}
+.pts{list-style:none;}
+.pts li{font-size:13px; color:var(--ink-soft); line-height:1.55; padding:7px 0 7px 22px; position:relative; border-bottom:1px solid var(--line);}
+.pts li:last-child{border-bottom:none;}
+.pts li::before{content:""; position:absolute; left:4px; top:13px; width:8px; height:8px; border-radius:50%; background:var(--green-m);}
+.tags{display:flex; flex-wrap:wrap; gap:7px; margin-top:4px;}
+.tags span{font-size:11.5px; padding:4px 11px; border-radius:20px; background:var(--bg-2); color:var(--green-m); font-weight:700;}
+.acts{display:flex; gap:10px; margin-top:4px;}
+.acts .btn{flex:1; min-width:0; width:auto; white-space:nowrap;}
+.raw-note{font-size:11px; color:var(--muted); text-align:center; margin:2px 0 6px;}
+
+/* ---- 复习 ---- */
+#v-review{height:100%; display:flex; flex-direction:column; overflow:hidden;}
+.rv-scroll{flex:1 1 auto; overflow-y:auto; padding:14px 16px 16px;}
+.rv-scroll::-webkit-scrollbar{width:0;}
+.digest-h{background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--green-m);
+  border-radius:var(--r-lg); padding:16px 18px; box-shadow:var(--e1); margin-bottom:14px;}
+.digest-h .d{font-size:12.5px; color:var(--muted);}
+.digest-h .big{font-size:18px; font-weight:900; color:var(--ink); margin-top:3px;}
+.digest-h .sub{font-size:12px; color:var(--ink-soft); margin-top:6px; line-height:1.5;}
+.rv-card{background:var(--surface); border-radius:var(--r-lg); padding:15px 16px; margin-bottom:13px; box-shadow:var(--e1); cursor:pointer; width:100%; text-align:left; font-family:inherit;}
+.rv-card .ct{font-size:13px; font-weight:800; color:var(--ink); margin-bottom:8px; display:flex; align-items:center; gap:7px;}
+.rv-card .ct::before{content:""; width:4px; height:14px; border-radius:3px; background:var(--green-m); flex:0 0 auto;}
+.rv-card .ct.g::before{background:var(--gold);}
+.pick-tag{margin-left:auto; font-size:10.5px; font-weight:800; color:#fff; background:var(--gold); padding:2px 8px; border-radius:8px;}
+.btn-store{margin-top:12px; width:100%; background:transparent; color:var(--green-m); border:1.5px solid var(--green-m);
+  border-radius:12px; padding:10px 16px; font-size:13.5px; font-weight:800; cursor:pointer; font-family:inherit; transition:.16s var(--ease);}
+.btn-store:active{transform:scale(.98); background:rgba(31,122,94,.08);}
+.btn-store.stored{background:var(--bg-2); color:var(--muted); border-color:var(--line); cursor:default;}
+.rv-foot{flex:0 0 auto; padding:12px 16px; background:var(--surface); box-shadow:0 -3px 12px rgba(14,74,60,.08);}
+.rv-foot .btn-primary{background:var(--green-m);}
+.done-tag{font-size:11.5px; color:var(--green-m); font-weight:700;}
+
+/* ---- 知识树 ---- */
+.toggle{display:inline-flex; background:var(--bg-2); border-radius:20px; padding:3px; gap:3px;}
+.toggle button{border:none; background:transparent; font-family:inherit; font-size:12.5px; font-weight:700; color:var(--muted);
+  padding:6px 16px; border-radius:17px; cursor:pointer; transition:.16s;}
+.toggle button.on{background:var(--surface); color:var(--green-m); box-shadow:var(--e1);}
+#v-tree{height:100%; display:flex; flex-direction:column; overflow:hidden;}
+.tree-body{flex:1 1 auto; overflow-y:auto; padding:14px 14px 20px;}
+.tree-body::-webkit-scrollbar{width:0;}
+.domain{background:var(--surface); border-radius:var(--r-lg); box-shadow:var(--e1); margin-bottom:11px; overflow:hidden; padding-bottom:10px;}
+.dhead{display:flex; align-items:center; gap:11px; padding:13px 15px 8px; cursor:pointer;}
+.dhead .ic{width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:18px; color:#fff; flex:0 0 auto;}
+.dhead .nm{font-size:14.5px; font-weight:800; color:var(--ink); flex:1;}
+.dhead .cnt{font-size:12px; color:var(--muted);}
+.chev{transition:transform .25s var(--ease); color:var(--muted);}
+.domain.open .chev{transform:rotate(90deg);}
+.domain .kids{display:none;}
+.domain.open .kids{display:block;}
+.leaf{display:flex; align-items:center; gap:10px; padding:9px 15px 9px 52px; cursor:pointer; transition:.14s;}
+.leaf:active{background:var(--bg-2);}
+.leaf .dot{width:9px; height:9px; border-radius:50%; flex:0 0 auto;}
+.leaf .lt{font-size:13px; font-weight:700; color:var(--ink);}
+.leaf .ls{font-size:11px; color:var(--muted); margin-top:1px;}
+.graph-box{flex:1 1 auto; min-height:0; display:flex; flex-direction:column; padding:4px 12px 12px;}
+.graph-wrap{position:relative; flex:1; min-height:0; background:var(--surface); border-radius:var(--r-lg);
+  box-shadow:var(--e1); overflow:hidden; touch-action:none;}
+.graph-wrap svg{width:100%; height:100%; display:block; cursor:grab;}
+.graph-wrap svg:active{cursor:grabbing;}
+.gctrl{position:absolute; right:10px; bottom:10px; display:flex; flex-direction:column; gap:8px; z-index:5;}
+.gctrl button{width:38px; height:38px; border-radius:12px; border:none; background:var(--surface); color:var(--green-m);
+  box-shadow:var(--e2); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:800; font-family:inherit;}
+.gctrl button:active{background:var(--bg-2);}
+.glegend{background:var(--surface); border-radius:var(--r-md); box-shadow:var(--e1); padding:10px 12px; margin-top:10px;}
+.glegend .gh{font-size:11px; font-weight:800; color:var(--ink); margin-bottom:5px;}
+.glegend .lg{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:10.5px; color:var(--ink-soft);}
+.glegend i{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px; vertical-align:middle;}
+.ghint{font-size:11px; color:var(--muted); text-align:center; margin-top:7px;}
+
+/* ---- 我的 ---- */
+.profile{background:var(--surface); border-radius:var(--r-lg); padding:18px; box-shadow:var(--e2); display:flex; gap:14px; align-items:center; margin-bottom:14px;}
+.avatar{width:56px; height:56px; border-radius:18px; background:var(--green-m); color:#fff; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:800; flex:0 0 auto; box-shadow:var(--e2);}
+.profile .nm{font-size:17px; font-weight:800; color:var(--ink);}
+.profile .ds{font-size:12px; color:var(--muted); margin-top:4px; line-height:1.5;}
+.set{background:var(--surface); border-radius:var(--r-lg); box-shadow:var(--e1); overflow:hidden; margin-bottom:13px;}
+.set .row{display:flex; align-items:center; padding:14px 16px; border-bottom:1px solid var(--line); gap:11px;}
+.set .row:last-child{border-bottom:none;}
+.set .rl{font-size:14px; color:var(--ink); flex:1; font-weight:600;}
+.set .ri{font-size:12px; color:var(--muted);}
+.set .ri.strong{color:var(--green-m); font-weight:800;}
+.switch{width:46px; height:26px; border-radius:13px; background:var(--teal-l); position:relative; cursor:pointer; transition:.2s; flex:0 0 auto; border:none;}
+.switch.on{background:var(--green-m);}
+.switch::after{content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; transition:.2s var(--ease); box-shadow:var(--e1);}
+.switch.on::after{left:23px;}
+.mode-item{display:flex; align-items:center; gap:11px; padding:11px 16px; border-top:1px solid var(--line); cursor:pointer; width:100%; text-align:left; font-family:inherit; background:transparent; border-left:none; border-right:none; border-bottom:none;}
+.mode-item:first-of-type{border-top:none;}
+.mode-item.on{background:var(--bg-2);}
+.radio{width:16px; height:16px; border-radius:8px; border:2px solid var(--teal-l); flex:0 0 auto;}
+.mode-item.on .radio{border-color:var(--green-m); background:var(--green-m); box-shadow:inset 0 0 0 3px #fff;}
+.mode-label{font-size:14px; font-weight:700; color:var(--ink);}
+.mode-item.on .mode-label{color:var(--green-m);}
+.mode-desc{font-size:11.5px; color:var(--muted); margin-top:2px;}
+.set-title{font-size:12.5px; font-weight:800; color:var(--muted); padding:12px 16px 6px;}
+.token-row{display:flex; align-items:center; gap:8px; padding:4px 12px 12px;}
+.token-box{flex:1; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; letter-spacing:.5px;
+  border:1px solid var(--line); border-radius:10px; padding:9px 11px; color:var(--ink-soft); background:var(--bg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.time-chips{display:flex; gap:6px;}
+.time-chip{padding:5px 10px; border-radius:14px; border:1px solid var(--teal-l); font-size:12px; font-weight:700; color:var(--green-m); cursor:pointer; font-family:inherit; background:transparent;}
+.time-chip.on{background:var(--green-m); border-color:var(--green-m); color:#fff;}
+
+/* ---- 记录 ---- */
+.cal-month{margin-bottom:22px;}
+.cal-title{font-size:14px; font-weight:800; color:var(--ink); margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+.cal-title span{font-size:11px; color:var(--muted); font-weight:500;}
+.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
+.cal-wk{text-align:center; font-size:10px; color:var(--muted); margin-bottom:6px;}
+.cal-dot{width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:10px; color:var(--muted); background:var(--bg-2); transition:.16s; justify-self:center;}
+.cal-dot.done{background:var(--green-m); color:#fff; font-weight:800;}
+.cal-dot.today{box-shadow:0 0 0 1.5px var(--green-m);}
+.cal-dot.empty{background:transparent; color:transparent; pointer-events:none;}
+
+/* ---- 底部导航 ---- */
+.nav{height:64px; flex:0 0 auto; background:var(--surface); display:flex; box-shadow:0 -2px 10px rgba(14,74,60,.08);
+  position:relative; z-index:25; padding-bottom:6px;}
+.nav button{flex:1; border:none; background:transparent; cursor:pointer; font-family:inherit; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:3px; color:var(--muted); transition:.16s;}
+.nav button svg{display:block;}
+.nav button .lb{font-size:10.5px; font-weight:700;}
+.nav button.active{color:var(--green-m);}
+
+/* ---- loading / toast ---- */
+.loading{position:absolute; inset:0; background:var(--bg); z-index:50; display:none; flex-direction:column; align-items:center; justify-content:center; gap:18px;}
+.loading.show{display:flex;}
+.spinner{width:58px; height:58px; border-radius:50%; border:5px solid var(--teal-l); border-top-color:var(--green-m); animation:spin .8s linear infinite;}
+.loading .lt{font-size:13.5px; color:var(--ink-soft); font-weight:700;}
+.loading .lnk{font-size:11px; color:var(--muted); max-width:260px; text-align:center; word-break:break-all;}
+.toast{position:absolute; left:50%; bottom:90px; transform:translateX(-50%) translateY(20px); background:var(--green-d); color:#fff;
+  padding:10px 18px; border-radius:24px; font-size:13px; font-weight:700; opacity:0; transition:.3s var(--ease); z-index:80; box-shadow:var(--e4); pointer-events:none; white-space:nowrap; max-width:88%;}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+.hidden{display:none !important;}
+.screen-anim{animation:fadeUp .4s var(--ease);}
+@keyframes fadeUp{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ---- 功能卡片 ---- */
+.features{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+.feature{background:var(--surface); border-radius:var(--r-lg); padding:24px; box-shadow:var(--e1); transition:.2s var(--ease); border:1px solid var(--line);}
+.feature:hover{transform:translateY(-4px); box-shadow:var(--e4);}
+.feature .ic{width:48px; height:48px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:23px; margin-bottom:16px; box-shadow:var(--e1);}
+.feature h4{font-size:16px; font-weight:800; color:var(--ink); margin-bottom:8px;}
+.feature p{font-size:13px; color:var(--muted); line-height:1.8;}
+
+/* ---- 技术栈 / API ---- */
+.tech-section{background:var(--green-d); color:#dbe9e2; padding:72px 0;}
+.tech-section .sec-head h2{color:#fff;}
+.tech-section .sec-head p{color:#a9c7bb;}
+.tech-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:22px; align-items:stretch;}
+.arch-card{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:var(--r-lg); padding:24px;}
+.arch-card h4{font-size:15px; font-weight:800; color:#fff; margin-bottom:16px; display:flex; align-items:center; gap:8px;}
+.arch-flow{display:flex; flex-direction:column; gap:10px;}
+.arch-node{display:flex; align-items:center; gap:12px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+  border-radius:12px; padding:12px 14px; font-size:13px;}
+.arch-node .k{width:34px; height:34px; border-radius:9px; background:rgba(217,154,31,.2); color:var(--gold-l);
+  display:flex; align-items:center; justify-content:center; font-size:16px; flex:0 0 auto;}
+.arch-node b{color:#fff; font-weight:700;}
+.arch-node span{color:#b6cdc2; font-size:12px; display:block; margin-top:1px;}
+.api-card{background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:var(--r-lg); padding:24px;}
+.api-card h4{font-size:15px; font-weight:800; color:#fff; margin-bottom:14px; display:flex; align-items:center; gap:8px;}
+.api-item{display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid rgba(255,255,255,.08);}
+.api-item:last-child{border-bottom:none;}
+.api-item .method{font-family:ui-monospace,Menlo,monospace; font-size:11px; font-weight:800; color:#0c2f27;
+  background:var(--gold); border-radius:6px; padding:3px 8px; flex:0 0 auto;}
+.api-item .path{font-family:ui-monospace,Menlo,monospace; font-size:12.5px; color:#eaf4ef;}
+.api-item .desc{font-size:11.5px; color:#a9c7bb; margin-left:auto; flex:0 0 auto;}
+.stack-row{display:flex; flex-wrap:wrap; gap:9px; margin-top:22px;}
+.stack-pill{font-size:12.5px; font-weight:700; color:#eaf4ef; background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.15);
+  padding:7px 15px; border-radius:20px;}
+.real-samples{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:22px;}
+.sample{background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:var(--r-md); padding:16px;}
+.sample .shead{font-size:12px; font-weight:800; color:var(--gold-l); margin-bottom:8px; display:flex; align-items:center; gap:7px;}
+.sample .shead .g{width:7px; height:7px; border-radius:50%; background:var(--green-l);}
+.sample pre{font-family:ui-monospace,Menlo,monospace; font-size:11px; line-height:1.7; color:#c4d8cf; white-space:pre-wrap; word-break:break-all;}
+
+/* ---- footer ---- */
+.footer{background:var(--bg); border-top:1px solid var(--line); padding:40px 24px; text-align:center;}
+.footer .f-logo{font-weight:900; font-size:18px; color:var(--green-d);}
+.footer p{font-size:12.5px; color:var(--muted); margin-top:8px; line-height:1.8;}
+.footer a{color:var(--green-m); font-weight:700; text-decoration:none;}
+
+@media (max-width:900px){
+  .features{grid-template-columns:1fr 1fr;}
+  .tech-grid{grid-template-columns:1fr;}
+  .real-samples{grid-template-columns:1fr;}
+}
+@media (max-width:640px){
+  .hero h1{font-size:40px;}
+  .features{grid-template-columns:1fr;}
+  .demo-grid{gap:36px;}
+  .phone{transform:scale(.9); transform-origin:top center; margin-bottom:-82px;}
+  .topnav .links{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================ 顶部导航 ============================ -->
+<nav class="topnav">
+  <div class="logo"><span class="mark">拾</span>拾知</div>
+  <div class="links">
+    <a href="#demo">交互演示</a>
+    <a href="#features">核心功能</a>
+    <a href="#tech">技术架构</a>
+  </div>
+</nav>
+
+<!-- ============================ Hero ============================ -->
+<header class="hero">
+  <div class="kicker"><span class="dot"></span>纯前端交互演示 · 数据为模拟</div>
+  <h1>拾<em>知</em></h1>
+  <div class="tagline">短视频知识碎片消化器</div>
+  <p class="pitch">刷到好内容，粘贴链接，AI 自动提炼成知识卡片、归入知识树，<br>每晚只把当天最重要的 20% 推送到你的主屏，其余零打扰。</p>
+  <div class="cta">
+    <a href="#demo" class="btn-hero">立即体验演示 ↓</a>
+    <a href="#features" class="btn-ghost">看看它是怎么工作的</a>
+  </div>
+  <div class="badges">
+    <span class="badge">React Native</span>
+    <span class="badge">Expo / EAS</span>
+    <span class="badge">TypeScript</span>
+    <span class="badge">Python</span>
+    <span class="badge">BibiGPT 开放 API</span>
+  </div>
+</header>
+
+<!-- ============================ 交互演示 ============================ -->
+<section class="demo-section" id="demo">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Live Demo</div>
+      <h2>点一点，走一遍完整流程</h2>
+      <p>这是一台可操作的模拟机 —— 解析链接 → 看知识卡片 → 存入知识树 → 晚间复习打卡，全部真实可点。</p>
+    </div>
+
+    <div class="demo-grid">
+      <div class="demo-copy">
+        <h3>和真机一样的完整闭环</h3>
+        <p>从粘贴链接到晚上收到精选推送，下面这台手机模拟了「拾知」的全部六个界面与交互。</p>
+        <ul>
+          <li><span class="num">1</span><span><b>首页</b>粘贴链接，看 AI 三步解析成知识卡片</span></li>
+          <li><span class="num">2</span><span><b>卡片</b>一句话精华 + 核心要点 + 智能标签 + 回看建议</span></li>
+          <li><span class="num">3</span><span><b>知识树</b>按领域自动归类，拖拽/缩放/聚焦知识图谱</span></li>
+          <li><span class="num">4</span><span><b>复习</b>20% 精选规则，一键完成今日回顾并打卡</span></li>
+        </ul>
+      </div>
+
+      <!-- ===================== 手机 ===================== -->
+      <div class="phone">
+        <div class="screen">
+          <div class="punch"></div>
+
+          <div class="status">
+            <span>9:41</span>
+            <span class="ic">
+              <svg width="17" height="12" viewBox="0 0 17 12"><g fill="#16302a"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="5" width="3" height="7" rx="1"/><rect x="9" y="2.5" width="3" height="9.5" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></g></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.2c2 0 3.9.8 5.3 2.1l1.2-1.3C13 1.2 10.6.3 8 .3S3 1.2 1.5 3l1.2 1.3C3.1 3 5 2.2 8 2.2z" fill="#16302a"/><path d="M8 5.6c1.1 0 2.2.5 3 1.2l1.2-1.3C11.2 4.3 9.7 3.6 8 3.6S4.8 4.3 3.8 5.5l1.2 1.3c.8-.7 1.9-1.2 3-1.2z" fill="#16302a"/><circle cx="8" cy="10.4" r="1.8" fill="#16302a"/></svg>
+              <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="#16302a" stroke-opacity=".4"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5" fill="#16302a"/><rect x="23" y="3.5" width="2" height="5" rx="1" fill="#16302a" fill-opacity=".4"/></svg>
+            </span>
+          </div>
+
+          <!-- ===== 首页 ===== -->
+          <div id="v-home">
+            <div class="appbar">
+              <span class="title">拾知</span><span class="sub">· 短视频知识寄存</span>
+              <span class="spacer"></span>
+              <span class="tag" style="border:1px solid var(--teal-l); color:var(--green-m); background:transparent;">单次 · 智能卡</span>
+            </div>
+            <div class="home-body">
+              <div class="hero-card">
+                <h3>把刷到的知识，寄存在这里</h3>
+                <p>粘贴 B 站 / YouTube / 文件直链，AI 帮你提炼、归类、晚上提醒回看。</p>
+                <div class="linkbox" id="homeLink">https://v.douyin.com/即兴演讲三步法…</div>
+                <button class="btn btn-primary" id="parseBtn" onclick="parseFlow()">粘贴链接，AI 解析成卡</button>
+              </div>
+              <div class="stats" id="homeStats"></div>
+              <div class="sec">最近收集</div>
+              <div id="homeList"></div>
+            </div>
+          </div>
+
+          <!-- ===== 详情 ===== -->
+          <div id="v-detail" class="scroll hidden">
+            <div class="appbar">
+              <button class="back" onclick="backTo()">‹</button>
+              <span class="title sm">知识卡片</span>
+            </div>
+            <div class="pad" id="detailBody"></div>
+          </div>
+
+          <!-- ===== 知识树 ===== -->
+          <div id="v-tree" class="hidden">
+            <div class="appbar">
+              <span class="title sm">我的知识树</span>
+              <span class="spacer"></span>
+              <div class="toggle">
+                <button id="t-list" class="on" onclick="setTree('list')">列表</button>
+                <button id="t-graph" onclick="setTree('graph')">图谱</button>
+              </div>
+            </div>
+            <div id="tree-list" class="tree-body"></div>
+            <div id="tree-graph" class="graph-box hidden">
+              <div class="graph-wrap" id="gwrap">
+                <svg id="gsvg" viewBox="0 0 560 600" preserveAspectRatio="xMidYMid meet"></svg>
+                <div class="gctrl">
+                  <button onclick="gZoom(1.25)" title="放大">＋</button>
+                  <button onclick="gZoom(0.8)" title="缩小">－</button>
+                  <button onclick="gReset()" title="复位">⟲</button>
+                </div>
+              </div>
+              <div class="glegend" id="glegend"></div>
+              <p class="ghint">拖动平移 · 滚轮/按钮缩放 · 点领域聚焦关联 · 点卡片看详情</p>
+            </div>
+          </div>
+
+          <!-- ===== 复习 ===== -->
+          <div id="v-review" class="hidden">
+            <div class="appbar">
+              <span class="title sm">晚间复习</span>
+              <span class="spacer"></span>
+              <span class="done-tag" id="doneTag" style="display:none;">今日已打卡 ✓</span>
+            </div>
+            <div class="rv-scroll" id="reviewBody"></div>
+            <div class="rv-foot">
+              <button class="btn btn-primary" id="finishBtn" onclick="finishReview()">完成今日回顾</button>
+            </div>
+          </div>
+
+          <!-- ===== 我的 ===== -->
+          <div id="v-me" class="scroll hidden">
+            <div class="appbar"><span class="title sm">我的</span></div>
+            <div class="pad" id="meBody"></div>
+          </div>
+
+          <!-- ===== 记录 ===== -->
+          <div id="v-records" class="scroll hidden">
+            <div class="appbar">
+              <button class="back" onclick="go('me')">‹</button>
+              <span class="title sm">过往记录</span>
+            </div>
+            <div class="pad" id="recordsBody"></div>
+          </div>
+
+          <!-- loading & toast -->
+          <div class="loading" id="loading"><div class="spinner"></div><div class="lt" id="lt">AI 正在解析这条视频…</div><div class="lnk" id="lurl"></div></div>
+          <div class="toast" id="toast"></div>
+
+          <!-- 底部导航 -->
+          <div class="nav">
+            <button class="active" data-v="home" onclick="go('home')">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v9a1 1 0 001 1h12a1 1 0 001-1v-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="lb">首页</span>
+            </button>
+            <button data-v="review" onclick="go('review')">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="lb">复习</span>
+            </button>
+            <button data-v="tree" onclick="go('tree')">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="2.4" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="18" r="2.4" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="18" r="2.4" stroke="currentColor" stroke-width="2"/><path d="M12 7v4M12 11l-5 5M12 11l5 5" stroke="currentColor" stroke-width="2"/></svg>
+              <span class="lb">知识树</span>
+            </button>
+            <button data-v="me" onclick="go('me')">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="2"/><path d="M5 20c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <span class="lb">我的</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 核心功能 ============================ -->
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Features</div>
+      <h2>治「收藏了从不回看」这件事</h2>
+      <p>六个功能，围绕一个目标：让刷到的知识真正沉淀下来，而不是堆在收藏夹里吃灰。</p>
+    </div>
+    <div class="features">
+      <div class="feature"><div class="ic" style="background:#e3f2ec;">📝</div><h4>一键解析成卡</h4><p>粘贴 B 站 / YouTube / 文件直链，AI 提炼「一句话精华 + 核心要点 + 智能标签 + 回看建议」。</p></div>
+      <div class="feature"><div class="ic" style="background:#eef0fa;">🌳</div><h4>知识树自动归类</h4><p>按领域自动生长知识图谱，跨领域共享标签自动连线，把零散卡片织成一张网。</p></div>
+      <div class="feature"><div class="ic" style="background:#f7efdb;">🔕</div><h4>20% 精选推送</h4><p>每晚定点只把当天最重要的 20% 推到主屏，其余内容零打扰，杜绝信息焦虑。</p></div>
+      <div class="feature"><div class="ic" style="background:#e3f2ec;">🔗</div><h4>短链展开 + 智能去重</h4><p>自动展开分享短链、归一不同链接形态，同一视频只收一次，省 API 额度。</p></div>
+      <div class="feature"><div class="ic" style="background:#eef0fa;">🎛️</div><h4>三种制卡模式</h4><p>单次智能卡 / 简洁卡 / 两次精制卡，可自由切换对比效果，兼顾速度与打磨。</p></div>
+      <div class="feature"><div class="ic" style="background:#f7efdb;">🌙</div><h4>打卡复盘</h4><p>完成「晚间复习」自动打卡，月历记录成长轨迹，把复习变成看得见的习惯。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 技术架构 / API ============================ -->
+<section class="tech-section" id="tech">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Architecture</div>
+      <h2>云端 API + 本地存储，无需自建后端</h2>
+      <p>AI 解析走 BibiGPT 开放 API，数据存手机本地，打包成独立 APK 即可离线日常使用。</p>
+    </div>
+
+    <div class="tech-grid">
+      <div class="arch-card">
+        <h4>⚙️ 架构</h4>
+        <div class="arch-flow">
+          <div class="arch-node"><span class="k">📱</span><div><b>React Native 客户端</b><span>Expo + TypeScript，本地状态管理</span></div></div>
+          <div class="arch-node"><span class="k">🤖</span><div><b>BibiGPT 开放 API</b><span>AI 解析 / 字幕抓取 / 额度查询</span></div></div>
+          <div class="arch-node"><span class="k">💾</span><div><b>AsyncStorage 本地存储</b><span>知识卡片、设置、打卡记录</span></div></div>
+          <div class="arch-node"><span class="k">🔔</span><div><b>本地定时通知</b><span>每晚 20% 精选，无需服务器推送</span></div></div>
+        </div>
+      </div>
+
+      <div class="api-card">
+        <h4>🔌 BibiGPT 开放 API（真实验证）</h4>
+        <div class="api-item"><span class="method">GET</span><span class="path">/v1/me</span><span class="desc">查额度</span></div>
+        <div class="api-item"><span class="method">GET</span><span class="path">/v1/summarize</span><span class="desc">链接总结</span></div>
+        <div class="api-item"><span class="method">GET</span><span class="path">/v1/getSubtitle</span><span class="desc">字幕抓取</span></div>
+        <div class="stack-row">
+          <span class="stack-pill">TypeScript</span>
+          <span class="stack-pill">Python</span>
+          <span class="stack-pill">React Native</span>
+          <span class="stack-pill">Expo / EAS</span>
+          <span class="stack-pill">Node.js</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="real-samples">
+      <div class="sample">
+        <div class="shead"><span class="g"></span>真实 API 输出 · B 站视频「机械设计 · 加强筋」</div>
+        <pre>## 摘要
+用结构代替堆料，让有限材料发挥最大效用……
+工程师在关键受力处布置「加强筋」，以极少量材料
+大幅提升刚度、优化载荷传递、减少异响。
+
+## 亮点
+- 加强筋不依赖材料堆砌，而是改变局部结构形状
+- 它是一条高效传力通道，把外力导向安装点
+- 刚度提升还能避免零件摩擦产生异响
+#机械设计 #加强筋 #注塑工艺</pre>
+      </div>
+      <div class="sample">
+        <div class="shead"><span class="g"></span>真实 API 输出 · 音乐 mp3 直链</div>
+        <pre>## 摘要
+梳理从创作到成品的全流程：作词、作曲、编曲、
+录音、后期处理，呈现现代音乐工业的精细分工。
+
+## 亮点
+- 词曲创作是作品的灵魂与基础
+- 编曲决定作品的听感基调
+- 混音提升音频清晰度，母带规范响度与音质
+#音乐制作 #编曲 #混音 #母带处理</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ Footer ============================ -->
+<footer class="footer">
+  <div class="f-logo">拾知 · 短视频知识碎片消化器</div>
+  <p>本页面为纯前端交互演示（单文件 · 零依赖 · 数据为模拟），仅用于简历/作品集展示。<br>
+  真实 App 基于 React Native + BibiGPT 开放 API 构建。API 文档见
+  <a href="https://docs.bibigpt.co/api-reference/introduction" target="_blank" rel="noopener">docs.bibigpt.co</a></p>
+</footer>
+
+<script>
+/* ==========================================================================
+   数据层 —— 镜像 App 的 CardItem 结构（title/domain/tldr/points/tags/verdict…）
+   其中「机械设计」与「音乐制作」两卡取自真实 API 输出。
+   ========================================================================== */
+const DSTYLE = {
+  '职场成长': {c:'#1f7a5e', e:'💼'},
+  'AI与效率': {c:'#2f8f76', e:'🤖'},
+  '心理':     {c:'#d99a1f', e:'🧠'},
+  '音乐':     {c:'#7a5fc0', e:'🎵'},
+  '科技':     {c:'#2f6f8f', e:'💻'},
+  '商业':     {c:'#8a6d3b', e:'📈'},
+  '学习':     {c:'#3c8a5a', e:'📚'},
+  '健康':     {c:'#c05f6e', e:'🏃'},
+  '生活':     {c:'#b07830', e:'🌿'},
+};
+const domStyle = (d) => DSTYLE[d] || {c:'#0e4a3c', e:'✨'};
+
+let seq = 0;
+const NOW = Date.now();
+const mk = (o) => {
+  const createdAt = NOW - (o.agoDays||0)*86400000 - (seq++);
+  return Object.assign({id:'c'+seq, createdAt, stored:false, real:false}, o);
+};
+
+let CARDS = [
+  mk({title:'为什么机械零件要加「加强筋」', domain:'科技', durationSec:372, author:'机械之美', agoDays:0, stored:true, real:true,
+      tldr:'用结构代替堆料：在关键受力处加筋，用最少材料大幅提升刚度，还能减少异响。',
+      points:['整体加厚会增加重量、成本，还给注塑成型添麻烦。','加强筋改变局部结构形状，用极少的材料大幅提高抗弯刚度。','它还是高效的传力通道，把外力导向螺钉卡扣等安装点。','刚度提升能减少零件震动位移，避免摩擦产生异响。','设计讲究「加得准」而非「加得多」，厚度高度走向都要精确。'],
+      tags:['机械设计','结构工程','注塑工艺','制造'],
+      verdict:'建议回看', verdictReason:'要点密集，涉及设计原理与工艺，回看一遍更划算。',
+      url:'https://bibigpt.co/content/0db4bd34-acc0-4cbb-b9ef-751984cfc5e1'}),
+  mk({title:'一首歌从创作到发行要几步', domain:'音乐', durationSec:240, author:'音乐小课堂', agoDays:0, real:true,
+      tldr:'词曲 → 编曲 → 混音 → 母带，四个环节精确定义了一首歌的听感与质感。',
+      points:['词曲创作是作品的灵魂与基础。','编曲把旋律歌词转化为完整音乐结构，决定听感基调。','混音调整音轨比例、空间感与频率均衡，提升清晰度。','母带规范响度、优化音质，保证各设备听感一致。','整个流程是高度专业化的协作系统。'],
+      tags:['音乐制作','编曲','混音','母带'],
+      verdict:'摘要足够', verdictReason:'信息密度不高，浏览摘要即可掌握大意。'}),
+  mk({title:'3 个让汇报更专业的公式', domain:'职场成长', durationSec:252, author:'表达教练阿May', agoDays:0, stored:true,
+      tldr:'汇报不是写得多，而是让老板 30 秒抓住重点：结论先行、数据支撑、给方案。',
+      points:['PREP 结构：观点 → 理由 → 案例 → 重申，适合即兴发言。','数据三明治：先结论，再铺证据，最后回扣结论。','给老板「选择题」而非「问答题」，附 2–3 个方案。'],
+      tags:['职场沟通','向上管理','汇报技巧'],
+      verdict:'建议回看', verdictReason:'临时汇报前翻一眼最划算，最容易被用到。'}),
+  mk({title:'用 AI 十分钟写完周报', domain:'AI与效率', durationSec:390, author:'效率阿杰', agoDays:0, stored:true,
+      tldr:'把「流水账」交给 AI，你只负责定框架和改重点，周报从 1 小时压到 10 分钟。',
+      points:['先给 AI 工作清单，再让它按「成果/进展/风险」归类。','用固定模板约束输出，避免自由发挥跑题。','最后人工补一句「下周计划」，显得有主动性。'],
+      tags:['AI工具','效率','周报'],
+      verdict:'摘要足够', verdictReason:'适合周末花 5 分钟实操一遍。'}),
+  mk({title:'为什么你总是「存了不看」', domain:'心理', durationSec:301, author:'心理小课堂', agoDays:0,
+      tldr:'「收藏 = 已掌握」是大脑给的虚假满足感；真正记住的是回看和用过的那部分。',
+      points:['收藏触发多巴胺，制造「我已经学了」的错觉。','信息堆积带来焦虑，反而更不想打开。','解决靠「小步回看」而非「大量收藏」。'],
+      tags:['行为心理','自我管理','焦虑'],
+      verdict:'摘要足够', verdictReason:'理解囤积心理，比再多存 10 条更有用。'}),
+  mk({title:'如何跟老板同步进度', domain:'职场成长', durationSec:228, author:'管理思维', agoDays:0, stored:true,
+      tldr:'主动、结构化、给结论的进度同步，让老板放心也让你少挨问。',
+      points:['每周固定时间同步，别等出问题才说。','用「结论-进展-需支持」三段式。','把风险提前讲，别捂到爆雷。'],
+      tags:['向上管理','沟通','汇报'],
+      verdict:'建议回看', verdictReason:'向上管理高频场景，临时汇报前翻一眼。'}),
+  mk({title:'5 款 AI 工具横评', domain:'AI与效率', durationSec:500, author:'工具控', agoDays:0,
+      tldr:'按「写/画/剪/管」四类挑 1–2 个长期用，比囤一堆更省心。',
+      points:['写作类看上下文长度与中文质量。','绘图类看风格可控性。','剪视频看自动化程度。'],
+      tags:['AI工具','评测','效率'],
+      verdict:'摘要足够', verdictReason:'评测类内容，按需查阅即可。'}),
+  mk({title:'费曼学习法：讲给别人听', domain:'学习', durationSec:280, author:'学习力研究所', agoDays:1, stored:true,
+      tldr:'能把一个概念用大白话讲给别人听，才算真正学会。',
+      points:['选定概念，用最朴素的话写在纸上。','讲给完全不懂的人听，卡壳处就是知识缺口。','回看资料补缺口，再简化表达。','用类比和例子替代术语，检验是否真的懂。'],
+      tags:['学习方法','输出','效率'],
+      verdict:'建议回看', verdictReason:'方法可操作，值得花 3 分钟实践。'}),
+  mk({title:'高效休息的 7 个方法', domain:'健康', durationSec:320, author:'精力教练', agoDays:0,
+      tldr:'真正的休息不是刷手机，而是切换用脑模式、恢复注意力。',
+      points:['每 90 分钟一个节奏，主动切换任务。','散步、发呆比刷短视频更恢复注意力。','睡眠质量比时长更重要。','把焦虑写下来，清空大脑缓存。'],
+      tags:['精力管理','自我管理','注意力'],
+      verdict:'建议回看', verdictReason:'与你「总是累」的状态强相关。'}),
+  mk({title:'一个视频讲清复利', domain:'商业', durationSec:300, author:'商业知识局', agoDays:2,
+      tldr:'复利的本质是「收益再投入」，时间越长，曲线越陡。',
+      points:['本金、收益率、时间是复利三要素。','亏损对复利的伤害比想象中大。','复利也适用于学习与技能积累。'],
+      tags:['投资','复利','财富'],
+      verdict:'摘要足够', verdictReason:'概念简单，摘要已覆盖核心。'}),
+];
+
+/* 解析流程的「待解析示例」，每点一次解析产出一张新卡（循环） */
+const INCOMING = [
+  {url:'https://v.douyin.com/即兴演讲三步法…', title:'即兴演讲：三步告别语塞', domain:'职场成长', durationSec:195, author:'表达教练',
+   tldr:'观点 + 理由 + 例子，套这个骨架，即兴发言也能有条理。',
+   points:['先亮观点，让听众知道你要说什么。','用「因为」接理由，撑住观点。','补一个身边的例子，让表达落地。'],
+   tags:['表达','演讲','职场沟通'], verdict:'建议回看', verdictReason:'高频场景，临时上台前翻一眼最划算。'},
+  {url:'https://www.bilibili.com/video/结构化思维…', title:'结构化思维的 5 个步骤', domain:'学习', durationSec:410, author:'思维方法论',
+   tldr:'结论先行、归类分组、逻辑递进，把复杂问题拆成清晰结构。',
+   points:['先定结论，再找支撑。','用 MECE 原则分组，不重不漏。','按时间/结构/重要性排序。','删掉无关信息。'],
+   tags:['结构化','思维模型','效率'], verdict:'建议回看', verdictReason:'通用思维框架，值得回看内化。'},
+  {url:'https://xhslink.cn/AI读论文…', title:'让 AI 帮你 10 分钟读一篇论文', domain:'AI与效率', durationSec:430, author:'科研助手',
+   tldr:'先让 AI 给摘要和术语表，再带着问题精读关键段落。',
+   points:['第一步要摘要 + 研究问题 + 结论。','第二步要术语表和核心图表解读。','第三步针对方法/局限提问追问。'],
+   tags:['AI工具','效率','论文'], verdict:'摘要足够', verdictReason:'操作步骤清晰，摘要即可上手。'},
+];
+let incomingIdx = 0;
+
+const RECORDS = new Set([
+  '2026-07-01','2026-07-03','2026-07-05','2026-07-08','2026-07-10','2026-07-12',
+  '2026-07-15','2026-07-18','2026-07-20','2026-07-22','2026-07-25','2026-07-28',
+  '2026-08-02','2026-08-04','2026-08-06','2026-08-09','2026-08-11','2026-08-13',
+  '2026-08-15','2026-08-17','2026-08-19',
+]);
+
+/* ==========================================================================
+   派生数据（复刻 store.ts 的 todayCards / pickTonight 20% 规则）
+   ========================================================================== */
+const dayKey = (t) => { const d=new Date(t); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const todayKey = () => dayKey(Date.now());
+const todayCards = () => CARDS.filter(c => dayKey(c.createdAt) === todayKey());
+function pickTonight(){
+  const today = todayCards();
+  if(!today.length) return [];
+  const n = Math.max(1, Math.round(today.length * 0.2));
+  return [...today].sort((a,b) => Number(a.stored) - Number(b.stored) || b.createdAt - a.createdAt).slice(0, n);
+}
+
+/* ==========================================================================
+   屏幕切换
+   ========================================================================== */
+const SCREENS = {home:'v-home', detail:'v-detail', tree:'v-tree', review:'v-review', me:'v-me', records:'v-records'};
+let currentScreen = 'home';
+let currentDetail = null;
+let detailFrom = 'home';
+
+function go(v){
+  Object.values(SCREENS).forEach(id => document.getElementById(id).classList.add('hidden'));
+  const el = document.getElementById(SCREENS[v]);
+  el.classList.remove('hidden');
+  el.classList.remove('screen-anim'); void el.offsetWidth; el.classList.add('screen-anim');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+  currentScreen = v;
+  if(v === 'home') renderHome();
+  if(v === 'review') renderReview();
+  if(v === 'me') renderMe();
+  if(v === 'tree') { setTree(treeMode); }
+  if(v === 'records') renderRecords();
+}
+function pushDetail(id){
+  detailFrom = currentScreen;
+  currentDetail = id;
+  renderDetail();
+  go('detail');
+}
+function backTo(){ go(detailFrom || 'home'); }
+
+/* ==========================================================================
+   首页
+   ========================================================================== */
+function renderHome(){
+  const stats = document.getElementById('homeStats');
+  const digestRate = CARDS.length ? Math.round(CARDS.filter(c=>c.stored).length / CARDS.length * 100) : 0;
+  stats.innerHTML = `
+    <div class="chip"><div class="n">${todayCards().length}</div><div class="l">今日收集</div></div>
+    <div class="chip"><div class="n">${CARDS.length}</div><div class="l">累计知识</div></div>
+    <div class="chip"><div class="n">${digestRate}%</div><div class="l">消化率</div></div>`;
+  const list = document.getElementById('homeList');
+  const recent = [...CARDS].sort((a,b)=>b.createdAt-a.createdAt).slice(0, 8);
+  if(!recent.length){ list.innerHTML = '<div class="empty">还没有收藏，从上方解析第一条视频开始 🌱</div>'; return; }
+  list.innerHTML = recent.map(c => {
+    const s = domStyle(c.domain);
+    return `<button class="mini" onclick="pushDetail('${c.id}')">
+      <span class="cov" style="background:${s.c}">${s.e}</span>
+      <span class="body"><span class="t" style="display:block">${esc(c.title)}</span><span class="sub" style="display:block">${c.domain}${c.durationSec ? ' · '+Math.round(c.durationSec/60)+' 分钟' : ''}</span></span>
+      <span class="tag ${c.stored ? 'muted' : 'gold'}">${c.stored ? '已入树' : c.verdict}</span>
+    </button>`;
+  }).join('');
+}
+
+/* ==========================================================================
+   解析流程（纯前端模拟：三步 loading → 产出新卡）
+   ========================================================================== */
+const parseStages = ['检测到短链，正在展开…','AI 解析视频内容…','生成知识卡片…'];
+function parseFlow(){
+  const input = document.getElementById('homeLink').textContent.trim();
+  const sample = INCOMING[incomingIdx % INCOMING.length]; incomingIdx++;
+  const link = input || sample.url;
+  document.getElementById('lurl').textContent = link;
+  const l = document.getElementById('loading'), t = document.getElementById('lt');
+  t.textContent = parseStages[0]; l.classList.add('show');
+  let i = 0;
+  const iv = setInterval(()=>{ i++; if(i < parseStages.length) t.textContent = parseStages[i]; }, 700);
+  setTimeout(()=>{
+    clearInterval(iv); l.classList.remove('show');
+    const c = mk(Object.assign({}, sample, {createdAt: Date.now(), agoDays:0, stored:false}));
+    CARDS.unshift(c);
+    renderHome();
+    pushDetail(c.id);
+  }, 2300);
+}
+
+/* ==========================================================================
+   详情
+   ========================================================================== */
+function fmtDur(sec){ if(!sec) return ''; return `${Math.floor(sec/60)}:${String(Math.floor(sec%60)).padStart(2,'0')}`; }
+function renderDetail(){
+  const c = CARDS.find(x => x.id === currentDetail);
+  const body = document.getElementById('detailBody');
+  if(!c){ body.innerHTML = '<div class="empty">卡片不存在或已删除</div>'; return; }
+  const s = domStyle(c.domain);
+  const meta = [c.domain, fmtDur(c.durationSec), c.author ? '@'+c.author : ''].filter(Boolean).join(' · ');
+  body.innerHTML = `
+    <div class="detail">
+      <div class="cov" style="background:${s.c}">
+        <span class="emj">${s.e}</span>
+        <span class="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+        <h4>${esc(c.title)}</h4>
+        <div class="meta">${esc(meta)}</div>
+      </div>
+      <div class="verdict ${c.verdict === '摘要足够' ? 'ok' : ''}">
+        <span class="vb">${c.verdict}</span>
+        <span class="vt">${esc(c.verdictReason)}</span>
+      </div>
+      <div class="card">
+        <div class="ct g">一句话精华</div>
+        <div class="tl">${esc(c.tldr)}</div>
+      </div>
+      <div class="card">
+        <div class="ct">核心要点</div>
+        <ul class="pts">${c.points.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
+      </div>
+      <div class="card">
+        <div class="ct">智能标签</div>
+        <div class="tags">${c.tags.map(t => `<span>${esc(t)}</span>`).join('')}</div>
+      </div>
+      <div class="acts">
+        <button class="btn ${c.stored ? 'btn-line' : 'btn-primary'}" onclick="${c.stored ? '' : `saveToTree('${c.id}')`}" ${c.stored ? 'disabled' : ''}>${c.stored ? '已在知识树 ✓' : '存入知识树'}</button>
+        <button class="btn btn-line" onclick="openSource('${c.id}')">回看原视频</button>
+      </div>
+      ${c.real ? '<p class="raw-note">* 本卡取自真实 BibiGPT API 输出</p>' : ''}
+    </div>`;
+}
+function saveToTree(id){
+  const c = CARDS.find(x => x.id === id);
+  if(!c || c.stored) return;
+  c.stored = true;
+  toast('已归入知识树 🌳');
+  renderDetail();
+  setTimeout(()=> go('tree'), 700);
+}
+function storeInReview(id){
+  const c = CARDS.find(x => x.id === id);
+  if(!c || c.stored) return;
+  c.stored = true;
+  toast('已存入知识树 🌳');
+  renderReview();
+}
+function openSource(id){
+  const c = CARDS.find(x => x.id === id);
+  if(c && c.url){ window.open(c.url, '_blank'); }
+  else toast('纯前端演示，仅示意跳转');
+}
+
+/* ==========================================================================
+   知识树
+   ========================================================================== */
+let treeMode = 'list';
+function setTree(mode){
+  treeMode = mode;
+  document.getElementById('t-list').classList.toggle('on', mode === 'list');
+  document.getElementById('t-graph').classList.toggle('on', mode === 'graph');
+  document.getElementById('tree-list').classList.toggle('hidden', mode !== 'list');
+  document.getElementById('tree-graph').classList.toggle('hidden', mode !== 'graph');
+  if(mode === 'list') renderTreeList();
+  else setTimeout(buildGraph, 30);
+}
+function renderTreeList(){
+  const box = document.getElementById('tree-list');
+  const stored = CARDS.filter(c => c.stored);
+  if(!stored.length){
+    box.innerHTML = `<div style="text-align:center;padding:46px 22px;color:var(--muted);">
+      <div style="font-size:38px;margin-bottom:12px;">🌱</div>
+      <div style="font-size:14.5px;font-weight:800;color:var(--ink-soft);margin-bottom:7px;">知识树还是空的</div>
+      <div style="font-size:12.5px;line-height:1.7;">在卡片详情点「存入知识树」，<br>知识会生长到这里。</div>
+    </div>`;
+    return;
+  }
+  const byDom = new Map();
+  stored.forEach(c => { const a = byDom.get(c.domain)||[]; a.push(c); byDom.set(c.domain, a); });
+  box.innerHTML = [...byDom.entries()].map(([d, items]) => {
+    const s = domStyle(d);
+    return `<div class="domain open" onclick="this.classList.toggle('open')">
+      <div class="dhead"><span class="ic" style="background:${s.c}">${s.e}</span><span class="nm">${d}</span><span class="cnt">${items.length} 张</span>
+        <svg class="chev" width="16" height="16" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="kids">${items.map(c => `<div class="leaf" onclick="event.stopPropagation();pushDetail('${c.id}')"><span class="dot" style="background:${s.c}"></span><div><div class="lt">${esc(c.title)}</div><div class="ls">${c.tags[0]||''}</div></div></div>`).join('')}</div>
+    </div>`;
+  }).join('') + `<p style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:6px;">AI 自动归类 · 点击领域可展开/收起</p>`;
+}
+
+/* ---- 图谱（径向布局 + 重叠消解 + 跨域虚线 + 拖动/缩放/聚焦） ---- */
+let gState = {x:0, y:0, k:1};
+let focusDom = null;
+function splitTitle(t){
+  if(t.length <= 7) return [t];
+  const r = t.slice(7,14);
+  return [t.slice(0,7), t.length > 14 ? r + '…' : r];
+}
+function textW(s, fs){ return s.length * fs + 4; }
+function buildGraph(){
+  const svg = document.getElementById('gsvg');
+  const stored = CARDS.filter(c => c.stored);
+  const byDom = new Map();
+  stored.forEach(c => { const a = byDom.get(c.domain)||[]; a.push(c); byDom.set(c.domain, a); });
+  const domains = [...byDom.keys()];
+
+  // 领域 → 颜色图例
+  document.getElementById('glegend').innerHTML = `<div class="gh">AI 识别领域 · 自动关联</div>
+    <div class="lg">${domains.map(d => `<span><i style="background:${domStyle(d).c}"></i>${d}</span>`).join('')}
+    <span><i style="background:var(--gold)"></i>虚线 = 跨域关联</span></div>`;
+
+  if(!stored.length){
+    svg.setAttribute('viewBox', '0 0 560 600');
+    svg.innerHTML = `<text x="280" y="280" text-anchor="middle" style="font-size:14px;fill:var(--muted)">还没有知识</text>
+      <text x="280" y="305" text-anchor="middle" style="font-size:12px;fill:var(--muted)">存入卡片后会在这里生长 🌿</text>`;
+    return;
+  }
+
+  const C = {x:0, y:0};
+  const DOM_R = Math.max(120, domains.length * 26);
+  const LEAF_R = DOM_R + 120;
+  const nodes = [];
+  domains.forEach((d, i) => {
+    const a = -Math.PI/2 + (2*Math.PI*i)/domains.length;
+    const dColor = domStyle(d).c;
+    const dW = Math.max(88, textW(d, 12.5) + 30);
+    nodes.push({key:'d:'+d, kind:'domain', x:C.x+Math.cos(a)*DOM_R, y:C.y+Math.sin(a)*DOM_R, w:dW, h:46, label:d, sub:byDom.get(d).length+' 张', color:dColor, domain:d});
+    const items = byDom.get(d);
+    const spread = Math.min(Math.PI*0.6, Math.max(0, items.length-1)*0.32);
+    items.forEach((c, j) => {
+      const off = items.length === 1 ? 0.16 : -spread/2 + (spread*j)/(items.length-1);
+      const lines = splitTitle(c.title);
+      const w = Math.max(80, Math.max(...lines.map(l => textW(l,11))) + 20);
+      nodes.push({key:'c:'+c.id, kind:'card', x:C.x+Math.cos(a+off)*LEAF_R, y:C.y+Math.sin(a+off)*LEAF_R, w, h:52, label:c.title, lines, sub:(c.tags[0]||''), color:domStyle(c.domain).c, domain:c.domain, card:c});
+    });
+  });
+  nodes.push({key:'root', kind:'root', x:C.x, y:C.y, w:120, h:52, label:'我的知识库', sub:stored.length+' 条', color:'#0e4a3c'});
+
+  // 重叠消解
+  for(let it=0; it<200; it++){
+    let moved = false;
+    for(let i=0;i<nodes.length;i++) for(let j=i+1;j<nodes.length;j++){
+      const A=nodes[i], B=nodes[j];
+      const ox = Math.min(A.x+A.w/2+6, B.x+B.w/2+6) - Math.max(A.x-A.w/2-6, B.x-B.w/2-6);
+      const oy = Math.min(A.y+A.h/2+6, B.y+B.h/2+6) - Math.max(A.y-A.h/2-6, B.y-B.h/2-6);
+      if(ox>0 && oy>0){
+        moved = true;
+        let dx=B.x-A.x, dy=B.y-A.y;
+        if(Math.abs(dx)<0.01 && Math.abs(dy)<0.01){ dx=(i-j)*0.5||0.5; dy=0.3; }
+        if(ox<oy){ const p=Math.sign(dx)*(ox/2+1); A.x-=p; B.x+=p; }
+        else { const p=Math.sign(dy)*(oy/2+1); A.y-=p; B.y+=p; }
+      }
+    }
+    if(!moved) break;
+  }
+  // 包围盒 → viewBox
+  const PAD=20;
+  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+  nodes.forEach(n=>{ minX=Math.min(minX,n.x-n.w/2); minY=Math.min(minY,n.y-n.h/2); maxX=Math.max(maxX,n.x+n.w/2); maxY=Math.max(maxY,n.y+n.h/2); });
+  nodes.forEach(n=>{ n.x += PAD-minX; n.y += PAD-minY; });
+  const VW = maxX-minX+PAD*2, VH = maxY-minY+PAD*2;
+  svg.setAttribute('viewBox', `0 0 ${VW} ${VH}`);
+  const byKey = new Map(nodes.map(n => [n.key, n]));
+
+  // 跨域关联（共享标签 → 金色虚线，每卡≤2，全图≤6）
+  const cross = [];
+  for(let i=0;i<stored.length;i++) for(let j=i+1;j<stored.length;j++){
+    const A=stored[i], B=stored[j];
+    if(A.domain===B.domain) continue;
+    const as=new Set(A.tags.map(t=>t.trim().toLowerCase()));
+    const shared=B.tags.filter(t=>as.has(t.trim().toLowerCase())).length;
+    if(shared>0) cross.push({a:'c:'+A.id, b:'c:'+B.id, s:shared});
+  }
+  cross.sort((x,y)=>y.s-x.s);
+  const used=new Map(), crossLinks=[];
+  for(const p of cross){
+    if(crossLinks.length>=6) break;
+    if((used.get(p.a)??0)>=2 || (used.get(p.b)??0)>=2) continue;
+    used.set(p.a,(used.get(p.a)??0)+1); used.set(p.b,(used.get(p.b)??0)+1);
+    crossLinks.push(p);
+  }
+
+  const lit = focusDom ? new Set(['root', 'd:'+focusDom]) : null;
+  if(lit){ stored.filter(c=>c.domain===focusDom).forEach(c=>lit.add('c:'+c.id));
+    crossLinks.forEach(({a,b})=>{ const A=byKey.get(a), B=byKey.get(b);
+      if(A && B && (A.domain===focusDom || B.domain===focusDom)){ lit.add(a); lit.add(b); if(A.domain) lit.add('d:'+A.domain); if(B.domain) lit.add('d:'+B.domain); } });
+  }
+  const dim = (k) => lit ? !lit.has(k) : false;
+
+  const bez = (A,B,curve) => {
+    const dx=B.x-A.x, dy=B.y-A.y, len=Math.sqrt(dx*dx+dy*dy)||1;
+    const px=(-dy/len)*curve, py=(dx/len)*curve;
+    return `M${A.x} ${A.y} C ${A.x+dx*0.35+px} ${A.y+dy*0.35+py}, ${A.x+dx*0.65+px} ${A.y+dy*0.65+py}, ${B.x} ${B.y}`;
+  };
+  const DIM = {fill:'#eef1f0', stroke:'#d7ddda', text:'#a0aaa6', link:'#e3e9e6'};
+
+  let html='';
+  // 树边
+  nodes.forEach(n=>{
+    if(n.kind==='card'){ const d=byKey.get('d:'+n.domain); if(!d) return;
+      html+=`<path d="${bez(d,n,16)}" fill="none" stroke="${dim(n.key)||dim(d.key)?DIM.link:(lit&&lit.has(n.key)&&lit.has(d.key)?'#d99a1f':'#c3dfd8')}" stroke-width="${lit&&lit.has(n.key)&&lit.has(d.key)?2.4:1.8}"/>`; }
+    else if(n.kind==='domain'){ const r=byKey.get('root'); if(!r) return;
+      const hot = focusDom===n.domain;
+      html+=`<path d="${bez(r,n,16)}" fill="none" stroke="${dim(n.key)?DIM.link:(hot?'#d99a1f':'#c3dfd8')}" stroke-width="${hot?2.8:2.2}" opacity="${dim(n.key)?0.5:0.95}"/>`; }
+  });
+  // 跨域虚线
+  crossLinks.forEach(lk=>{ const A=byKey.get(lk.a), B=byKey.get(lk.b); if(!A||!B) return;
+    const hot = lit && lit.has(lk.a) && lit.has(lk.b);
+    html+=`<path d="${bez(A,B,34)}" fill="none" stroke="${dim(lk.a)||dim(lk.b)?DIM.link:'#d99a1f'}" stroke-width="${hot?1.8:1.3}" stroke-dasharray="4 4" opacity="${dim(lk.a)||dim(lk.b)?0.4:(hot?0.95:0.75)}"/>`; });
+  // 节点
+  nodes.forEach(n=>{
+    if(n.kind==='root'){
+      html+=`<g class="gnode" data-id="${n.key}" style="cursor:pointer" onclick="focusNode(null)">
+        <rect x="${n.x-n.w/2}" y="${n.y-n.h/2}" width="${n.w}" height="${n.h}" rx="16" fill="${n.color}"/>
+        <text x="${n.x}" y="${n.y-2}" text-anchor="middle" style="font-size:14px;font-weight:800;fill:#fff">${n.label}</text>
+        <text x="${n.x}" y="${n.y+17}" text-anchor="middle" style="font-size:10.5px;fill:#cfe6dd">${n.sub}</text></g>`;
+    } else if(n.kind==='domain'){
+      const focused = focusDom===n.domain;
+      html+=`<g class="gnode" data-id="${n.key}" style="cursor:pointer;opacity:${dim(n.key)?0.3:1}" onclick="focusNode('${n.domain}')">
+        <rect x="${n.x-n.w/2}" y="${n.y-n.h/2}" width="${n.w}" height="${n.h}" rx="12" fill="${focused?n.color:(dim(n.key)?DIM.fill:'#fff')}" stroke="${focused?n.color:(dim(n.key)?DIM.stroke:n.color)}" stroke-width="2"/>
+        <text x="${n.x}" y="${n.y}" text-anchor="middle" style="font-size:12.5px;font-weight:800;fill:${focused?'#fff':(dim(n.key)?DIM.text:'#16302a')}">${n.label}</text>
+        <text x="${n.x}" y="${n.y+15}" text-anchor="middle" style="font-size:9.5px;fill:${focused?'rgba(255,255,255,.85)':(dim(n.key)?DIM.text:'#6b7d76')}">${n.sub}</text></g>`;
+    } else {
+      html+=`<g class="gnode" data-id="${n.key}" style="cursor:pointer;opacity:${dim(n.key)?0.3:1}" onclick="pushDetail('${n.card.id}')">
+        <rect x="${n.x-n.w/2}" y="${n.y-n.h/2}" width="${n.w}" height="${n.h}" rx="12" fill="${dim(n.key)?DIM.fill:'#fff'}" stroke="${dim(n.key)?DIM.stroke:n.color}" stroke-width="2"/>
+        ${n.lines.map((l,idx)=>`<text x="${n.x}" y="${n.y-(n.lines.length===1?3:9)+idx*13}" text-anchor="middle" style="font-size:11px;font-weight:700;fill:${dim(n.key)?DIM.text:'#16302a'}">${l}</text>`).join('')}
+        ${n.sub?`<text x="${n.x}" y="${n.y+(n.lines.length===1?13:19)}" text-anchor="middle" style="font-size:8.5px;fill:${dim(n.key)?DIM.text:'#6b7d76'}">${n.sub}</text>`:''}</g>`;
+    }
+  });
+  svg.innerHTML = html;
+  gState = {x:0, y:0, k:1};
+  applyTransform();
+}
+function focusNode(d){ focusDom = d; buildGraph(); }
+function applyTransform(){
+  const svg = document.getElementById('gsvg');
+  svg.style.transformOrigin = '0 0';
+  svg.style.transform = `translate(${gState.x}px, ${gState.y}px) scale(${gState.k})`;
+}
+function gZoom(f){ gState.k = Math.min(2.4, Math.max(0.5, gState.k*f)); applyTransform(); }
+function gReset(){ gState={x:0,y:0,k:1}; focusDom=null; buildGraph(); }
+
+/* 拖动平移 + 滚轮缩放 */
+(function(){
+  const wrap = document.getElementById('gwrap');
+  const svg = document.getElementById('gsvg');
+  let drag = null;
+  wrap.addEventListener('pointerdown', e => { drag = {x:e.clientX, y:e.clientY, sx:gState.x, sy:gState.y}; });
+  window.addEventListener('pointermove', e => { if(!drag) return; gState.x = drag.sx + (e.clientX-drag.x); gState.y = drag.sy + (e.clientY-drag.y); applyTransform(); });
+  window.addEventListener('pointerup', () => drag = null);
+  wrap.addEventListener('wheel', e => {
+    e.preventDefault();
+    const f = e.deltaY < 0 ? 1.1 : 0.9;
+    gState.k = Math.min(2.4, Math.max(0.5, gState.k*f));
+    applyTransform();
+  }, {passive:false});
+  svg.addEventListener('click', e => { if(e.target === svg) focusNode(null); });
+})();
+
+/* ==========================================================================
+   复习
+   ========================================================================== */
+function renderReview(){
+  const picks = pickTonight();
+  const pickIds = new Set(picks.map(p=>p.id));
+  const today = todayCards();
+  const rest = today.filter(c => !pickIds.has(c.id));
+  const done = RECORDS.has(todayKey());
+  const d = new Date();
+  const dateLabel = `${d.getMonth()+1} 月 ${d.getDate()} 日`;
+
+  document.getElementById('doneTag').style.display = done ? 'inline' : 'none';
+  const btn = document.getElementById('finishBtn');
+  btn.disabled = done || !picks.length;
+  btn.style.opacity = (done || !picks.length) ? 0.5 : 1;
+  btn.textContent = done ? '今日已完成' : '完成今日回顾';
+
+  const cardHtml = (c, isPick) => `
+    <div class="rv-card" onclick="pushDetail('${c.id}')">
+      <div class="ct ${c.verdict==='建议回看'?'g':''}">${c.verdict} · ${c.domain}${isPick?'<span class="pick-tag">重点推荐</span>':''}</div>
+      <div class="tl"><b style="color:var(--ink)">${esc(c.title)}</b><br>${esc(c.verdictReason)}</div>
+      <button class="btn-store ${c.stored?'stored':''}" ${c.stored?'disabled':''} onclick="event.stopPropagation();storeInReview('${c.id}')">${c.stored?'已存入 ✓':'存入知识树'}</button>
+    </div>`;
+
+  const body = document.getElementById('reviewBody');
+  body.innerHTML = `
+    <div class="digest-h">
+      <div class="d">今晚 · ${dateLabel}</div>
+      <div class="big">${picks.length ? `为你挑出 ${picks.length} 条值得回看` : '今天还没有收藏'}</div>
+      <div class="sub">${picks.length ? `规则：当日收藏 × 20%（今日共 ${today.length} 条，未入树的优先）` : '去首页解析一条视频，今晚就有得复习 🌱'}</div>
+    </div>
+    ${picks.length ? `<div class="sec">重点推荐</div>`+picks.map(c=>cardHtml(c,true)).join('') : ''}
+    ${rest.length ? `<div class="sec">今日收藏 · 共 ${today.length} 条</div>`+rest.map(c=>cardHtml(c,false)).join('') : ''}`;
+}
+function finishReview(){
+  RECORDS.add(todayKey());
+  toast('今日回顾完成，明天见 🌿');
+  renderReview();
+  renderMe();
+}
+
+/* ==========================================================================
+   我的
+   ========================================================================== */
+let cardMode = 1;
+const MODE_INFO = {
+  1:{label:'单次 · 智能卡', desc:'一次调用直接产出结构化卡片，省额度、速度快（推荐）'},
+  2:{label:'单次 · 简洁卡', desc:'默认总结 + 本地解析，保留原始总结全文'},
+  3:{label:'两次 · 精制卡', desc:'先总结再由 AI 精修，两次调用、内容更打磨'},
+};
+function renderMe(){
+  const stored = CARDS.filter(c=>c.stored);
+  const domains = new Set(stored.map(c=>c.domain)).size;
+  const weekAgo = Date.now() - 7*86400000;
+  const weekDigested = CARDS.filter(c=>c.stored && c.createdAt > weekAgo).length;
+  document.getElementById('meBody').innerHTML = `
+    <div class="profile">
+      <div class="avatar">小</div>
+      <div><div class="nm">演示用户</div><div class="ds">黑客松项目 · 短视频知识碎片消化器</div></div>
+    </div>
+    <div class="set">
+      <div class="set-title">BibiGPT API Token</div>
+      <div class="token-row"><span class="token-box">BS70••••••RKX（演示用，已打码）</span></div>
+    </div>
+    <div class="set">
+      <div class="set-title">制卡模式（可自由切换对比效果）</div>
+      ${[1,2,3].map(m => `<button class="mode-item ${cardMode===m?'on':''}" onclick="setMode(${m})">
+        <span class="radio"></span><span><span class="mode-label" style="display:block">${MODE_INFO[m].label}</span><span class="mode-desc" style="display:block">${MODE_INFO[m].desc}</span></span>
+      </button>`).join('')}
+    </div>
+    <div class="set">
+      <div class="row"><span class="rl">晚间复习提醒（20% 精选推送）</span><button class="switch on" id="remindSw" onclick="this.classList.toggle('on')"></button></div>
+    </div>
+    <div class="set">
+      <div class="row"><span class="rl">累计知识</span><span class="ri strong">${CARDS.length} 条</span></div>
+      <div class="row"><span class="rl">本周消化</span><span class="ri strong">${weekDigested} 条</span></div>
+      <div class="row"><span class="rl">知识树领域</span><span class="ri">${domains} 个</span></div>
+    </div>
+    <div class="set">
+      <button class="row" style="width:100%;text-align:left;font-family:inherit;background:transparent;border:none;cursor:pointer;font-size:inherit;" onclick="go('records')"><span class="rl">过往记录</span><span class="ri">已打卡 ${RECORDS.size} 天 ›</span></button>
+      <div class="row"><span class="rl">关于拾知</span><span class="ri">v1.0 黑客松版</span></div>
+    </div>`;
+}
+function setMode(m){ cardMode = m; renderMe(); toast('制卡模式已切换：'+MODE_INFO[m].label); }
+
+/* ==========================================================================
+   记录（月历打卡）
+   ========================================================================== */
+const WK = ['日','一','二','三','四','五','六'];
+function renderRecords(){
+  const el = document.getElementById('recordsBody');
+  const today = todayKey();
+  const month = (offset) => {
+    const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()-offset);
+    const y=d.getFullYear(), mo=d.getMonth();
+    const first=new Date(y,mo,1).getDay();
+    const days=new Date(y,mo+1,0).getDate();
+    let cells='', done=0;
+    for(let i=0;i<first;i++) cells+='<div class="cal-dot empty"></div>';
+    for(let day=1;day<=days;day++){
+      const key=y+'-'+String(mo+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+      const isDone=RECORDS.has(key), isToday=key===today;
+      if(isDone) done++;
+      cells+=`<div class="cal-dot ${isDone?'done':''} ${isToday?'today':''}">${day}</div>`;
+    }
+    return `<div class="cal-month"><div class="cal-title">${y} 年 ${mo+1} 月 <span>已打卡 ${done} 天</span></div>
+      <div class="cal-grid">${WK.map(w=>`<div class="cal-wk">${w}</div>`).join('')}</div>
+      <div class="cal-grid">${cells}</div></div>`;
+  };
+  el.innerHTML = `<p style="font-size:12.5px;color:var(--muted);margin:0 0 16px;line-height:1.6;">每完成一次「今日回顾」即打卡一天。圆点越满，知识的根系越深 🌿</p>` + month(0) + month(1);
+}
+
+/* ==========================================================================
+   工具
+   ========================================================================== */
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+let toastT;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(()=> t.classList.remove('show'), 1900);
+}
+
+/* ==========================================================================
+   初始渲染
+   ========================================================================== */
+renderHome();
+</script>
+</body>
+</html>
