@@ -17,6 +17,8 @@ bibigpt-pack/
 ├── docs/
 │   └── bibigpt_openapi.json      # 官方 OpenAPI 规范（全部 40 个端点，本地参考）
 ├── mobile/                       # 拾知 App（React Native / Expo）
+├── web/
+│   └── index.html                # 拾知网页版（纯前端单文件，含接入教程，真实调用 BibiGPT API）
 ├── python/
 │   └── bibigpt_demo.py           # Python 版（依赖：requests）
 └── typescript/
@@ -56,3 +58,16 @@ npx eas-cli update --branch preview --message "更新说明"
 ### 新手引导
 
 首次打开 App 会强制进入 BibiGPT Token 接入引导（获取→粘贴→/v1/me 验证→进入），可跳过或按返回键回退；「我的」页可随时重新运行引导。
+
+---
+
+## 网页版
+
+**🌐 在线直接使用（GitHub Pages）：<https://yhs00000.github.io/shizhi/web/>**
+
+`web/index.html` 是拾知的纯前端网页版（无需安装、无需后端），与 App 共用同一套 BibiGPT API 调用逻辑：
+
+- 直接双击打开即可使用（或用任意静态服务器托管），数据存在浏览器本地（localStorage），Token 不会上传到任何第三方服务器
+- 首次打开会进入接入教程：获取 Token → 粘贴 → `/v1/me` 验证 → 进入，之后在「我的」页可随时重新运行教程
+- 真实调用 `api.bibigpt.co`（已验证该 API 对浏览器开放 CORS），支持三种制卡模式、短链展开、同内容去重、知识树归档
+- 未内置任何演示 Token——必须接入你自己的 BibiGPT Token 才能解析

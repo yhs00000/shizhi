@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>拾知 · 网页版</title>
+<style>
+  :root {
+    --greenD:#0e4a3c; --greenM:#1f7a5e; --greenL:#2f8f76;
+    --tealL:#c3dfd8; --gold:#d99a1f; --goldL:#f3dca0;
+    --surface:#ffffff; --bg:#eef4f1; --bg2:#e4efe9;
+    --line:#dce8e2; --ink:#16302a; --inkSoft:#33514a; --muted:#6b7d76;
+    --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:26px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    display: flex; justify-content: center;
+  }
+  #app { width: 100%; max-width: 480px; min-height: 100vh; background: var(--bg); position: relative; display: flex; flex-direction: column; }
+  .appbar {
+    height: 56px; display:flex; align-items:center; padding:0 16px; background:var(--surface);
+    box-shadow:0 1px 6px rgba(14,74,60,.08); position: sticky; top:0; z-index: 5; gap:8px;
+  }
+  .appbar .back { font-size:26px; cursor:pointer; width:30px; color:var(--ink); line-height:1; }
+  .appbar h1 { font-size:17px; font-weight:800; margin:0; }
+  .appbar .sub { font-size:12px; color:var(--muted); font-weight:500; }
+  .appbar .spacer { flex:1; }
+  .modeTag {
+    font-size:11px; color:var(--greenM); border:1px solid var(--tealL); padding:3px 9px;
+    border-radius:10px; font-weight:600; white-space:nowrap;
+  }
+  .body { flex:1; padding:14px; padding-bottom:84px; overflow-y:auto; }
+  .card { background:var(--surface); border-radius:var(--r-lg); padding:15px 16px; margin-bottom:13px; box-shadow:0 1px 6px rgba(14,74,60,.06); }
+  .hero { padding:15px; }
+  .hero h2 { font-size:16px; font-weight:800; margin:0 0 3px; }
+  .hero p { font-size:12.5px; color:var(--muted); line-height:19px; margin:0 0 11px; }
+  .linkRow { display:flex; gap:8px; margin-bottom:11px; }
+  .linkbox {
+    flex:1; background:var(--bg2); border:1.4px dashed var(--tealL); border-radius:12px;
+    padding:9px 11px; font-size:12px; color:var(--inkSoft); width:100%;
+  }
+  .pasteBtn { background:var(--tealL); color:var(--greenD); border:none; border-radius:12px; padding:0 14px; font-weight:700; font-size:13px; cursor:pointer; }
+  .btnPrimary {
+    background:var(--greenM); color:#fff; border:none; border-radius:12px; padding:12px; width:100%;
+    font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btnPrimary:disabled { opacity:.6; cursor:default; }
+  .btnGhost {
+    border:1.5px solid var(--greenM); color:var(--greenM); background:transparent; border-radius:12px;
+    padding:11px; width:100%; font-weight:700; font-size:14px; cursor:pointer; text-decoration:none; display:block; text-align:center;
+  }
+  .btnLine {
+    flex:1; border:1.4px solid var(--tealL); color:var(--greenM); background:transparent; border-radius:12px;
+    padding:12px; font-size:13.5px; font-weight:700; cursor:pointer;
+  }
+  .stats { display:flex; gap:10px; margin-top:12px; }
+  .chip { flex:1; background:var(--surface); border-radius:var(--r-md); padding:11px 0; text-align:center; box-shadow:0 1px 6px rgba(14,74,60,.06); }
+  .chip b { display:block; font-size:18px; font-weight:900; color:var(--greenM); }
+  .chip span { font-size:11px; color:var(--muted); margin-top:4px; display:block; }
+  .secRow { display:flex; align-items:center; gap:8px; margin:16px 2px 9px; }
+  .secBar { width:4px; height:15px; border-radius:3px; background:var(--gold); }
+  .sec { font-size:13px; font-weight:800; }
+  .empty { text-align:center; color:var(--muted); font-size:12.5px; margin:24px 0; }
+  .mini { display:flex; align-items:center; gap:11px; background:var(--surface); border-radius:var(--r-md); padding:10px 12px; margin-bottom:9px; cursor:pointer; box-shadow:0 1px 6px rgba(14,74,60,.06); }
+  .miniCov { width:42px; height:42px; border-radius:11px; display:flex; align-items:center; justify-content:center; background:var(--greenD); font-size:19px; flex-shrink:0; }
+  .miniBody { flex:1; min-width:0; }
+  .miniT { font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .miniSub { font-size:11px; color:var(--muted); margin-top:2px; }
+  .tag { font-size:10.5px; padding:2px 8px; border-radius:8px; font-weight:700; white-space:nowrap; }
+  .tagGold { background:var(--gold); color:#fff; }
+  .tagMuted { border:1px solid var(--line); color:var(--muted); }
+  .tabbar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; display:flex; background:var(--surface); box-shadow:0 -1px 8px rgba(14,74,60,.08); z-index:6; }
+  .tabbtn { flex:1; text-align:center; padding:9px 0 10px; cursor:pointer; color:var(--muted); font-size:11px; font-weight:600; border:none; background:transparent; }
+  .tabbtn .ic { font-size:19px; display:block; }
+  .tabbtn.on { color:var(--greenM); }
+  /* detail */
+  .cov { border-radius:var(--r-lg); padding:16px; min-height:120px; display:flex; flex-direction:column; justify-content:flex-end; background:var(--greenD); color:#fff; box-shadow:0 2px 10px rgba(14,74,60,.12);}
+  .cov .em { font-size:34px; margin-bottom:8px; }
+  .cov .t { font-size:17px; font-weight:900; margin-bottom:4px; }
+  .cov .m { font-size:12px; color:#cfe6dd; }
+  .verdict { display:flex; align-items:center; gap:8px; background:rgba(217,154,31,.10); border:1px solid var(--tealL); border-radius:var(--r-md); padding:10px 12px; margin:14px 0; }
+  .verdict b { font-size:12px; font-weight:800; white-space:nowrap; }
+  .verdict span { flex:1; font-size:12.5px; color:var(--inkSoft); line-height:18px; }
+  .ctRow { display:flex; align-items:center; gap:7px; margin-bottom:8px; }
+  .ctBar { width:4px; height:14px; border-radius:3px; background:var(--greenM); }
+  .ct { font-size:13px; font-weight:800; }
+  .tl { font-size:13.5px; color:var(--inkSoft); line-height:24px; white-space:pre-wrap; }
+  .ptRow { display:flex; gap:10px; padding:7px 0; border-bottom:1px solid var(--line); }
+  .ptRow:last-child { border-bottom:none; }
+  .dot { width:8px; height:8px; border-radius:4px; background:var(--greenM); margin-top:6px; flex-shrink:0; }
+  .pt { flex:1; font-size:13px; color:var(--inkSoft); line-height:20px; }
+  .tags { display:flex; flex-wrap:wrap; gap:7px; }
+  .tagChip { font-size:11.5px; padding:4px 11px; border-radius:20px; background:var(--bg2); color:var(--greenM); font-weight:700; }
+  .acts { display:flex; gap:10px; margin-top:4px; }
+  .deleteBtn { margin-top:14px; text-align:center; padding:8px; color:#b34a4a; font-size:13px; font-weight:700; cursor:pointer; }
+  /* settings */
+  .setTitle { font-size:12.5px; font-weight:800; color:var(--muted); padding:10px 16px 6px; }
+  .inputBox { margin:0 12px 12px; border:1px solid var(--line); border-radius:10px; padding:10px; font-size:13px; width:calc(100% - 24px); }
+  .set { background:var(--surface); border-radius:var(--r-lg); margin-bottom:13px; overflow:hidden; padding:4px 0; box-shadow:0 1px 6px rgba(14,74,60,.06); }
+  .row { display:flex; align-items:center; gap:11px; padding:13px 16px; border-top:1px solid var(--line); }
+  .set .row:first-child, .set .setTitle:first-child + .row { border-top:none; }
+  .rl { flex:1; font-size:14px; font-weight:600; }
+  .ri { font-size:12px; color:var(--muted); }
+  .riStrong { font-size:12px; color:var(--greenM); font-weight:800; }
+  .modeItem { display:flex; align-items:center; gap:11px; padding:11px 16px; border-top:1px solid var(--line); cursor:pointer; }
+  .modeItem.on { background:var(--bg2); }
+  .radio { width:16px; height:16px; border-radius:8px; border:2px solid var(--tealL); flex-shrink:0; }
+  .radio.on { border-color:var(--greenM); background:var(--greenM); }
+  .modeLabel { font-size:14px; font-weight:700; }
+  .modeDesc { font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .linkText { color:var(--greenM); font-size:12.5px; font-weight:600; cursor:pointer; }
+  /* onboarding modal */
+  .overlay { position:fixed; inset:0; background:rgba(14,48,42,.55); z-index:50; display:flex; justify-content:center; overflow-y:auto; }
+  .onbWrap { width:100%; max-width:480px; background:var(--bg); min-height:100vh; padding:24px; padding-bottom:48px; }
+  .onbEmoji { font-size:44px; text-align:center; margin-top:24px; }
+  .onbTitle { font-size:24px; font-weight:700; color:var(--greenD); text-align:center; margin-top:8px; }
+  .onbSub { font-size:13px; line-height:21px; color:var(--inkSoft); text-align:center; margin:12px 0 20px; }
+  .step { font-size:14px; font-weight:700; color:var(--greenD); margin-bottom:8px; margin-top:18px; }
+  .step:first-child { margin-top:0; }
+  .hint { font-size:12px; color:var(--muted); margin-top:8px; line-height:18px; }
+  .okBox { margin-top:14px; }
+  .okText { font-size:13px; color:var(--greenM); font-weight:600; line-height:20px; margin-bottom:10px; }
+  .failText { margin-top:12px; font-size:12px; color:#c0392b; line-height:18px; }
+  .skip { margin-top:24px; text-align:center; color:var(--muted); font-size:13px; cursor:pointer; }
+  .spin { width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  /* toast */
+  #toast { position:fixed; bottom:76px; left:50%; transform:translateX(-50%); background:var(--greenD); color:#fff;
+    padding:10px 18px; border-radius:20px; font-size:12.5px; z-index:80; opacity:0; transition:opacity .25s; pointer-events:none; max-width:90%; text-align:center; }
+  #toast.show { opacity:1; }
+  a { color: var(--greenM); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ========================= 主题 / 领域 ========================= */
+const DOMAIN_STYLE = [
+  { keys: ['AI','ai','人工智能','大模型','GPT','效率','工具'], emoji: '🤖' },
+  { keys: ['职场','汇报','工作','管理','沟通','求职'], emoji: '💼' },
+  { keys: ['心理','情绪','焦虑','习惯','认知'], emoji: '🧠' },
+  { keys: ['音乐','艺术','设计','影视','文学'], emoji: '🎵' },
+  { keys: ['科技','编程','代码','数码','互联网','产品'], emoji: '💻' },
+  { keys: ['商业','经济','投资','创业','金融'], emoji: '📈' },
+  { keys: ['学习','考试','读书','英语','教育'], emoji: '📚' },
+  { keys: ['健康','运动','养生','医'], emoji: '🏃' },
+  { keys: ['生活','美食','旅行','vlog'], emoji: '🌿' },
+];
+function cardEmoji(domain) {
+  const hit = DOMAIN_STYLE.find((d) => d.keys.some((k) => domain.includes(k)));
+  return hit ? hit.emoji : '✨';
+}
+
+/* ========================= API（真实请求 api.bibigpt.co） ========================= */
+const BASE = 'https://api.bibigpt.co/api';
+const ERROR_HINTS = {
+  400: '参数错误，检查链接是否完整', 401: 'Token 无效，请到「我的」页检查',
+  403: '额度不足，去 bibigpt.co/shop 充值时长', 404: '资源不存在',
+  422: '音视频超出时长限制', 500: '服务端错误，稍后重试',
+};
+const TOKEN_PAGE = 'https://bibigpt.co/user/integration';
+
+async function apiCall(method, path, token, opts = {}) {
+  const qs = opts.params ? `?${new URLSearchParams(opts.params).toString()}` : '';
+  let resp;
+  try {
+    resp = await fetch(BASE + path + qs, {
+      method,
+      headers: { Authorization: `Bearer ${token}`, ...(opts.body ? { 'Content-Type': 'application/json' } : {}) },
+      ...(opts.body ? { body: JSON.stringify(opts.body) } : {}),
+    });
+  } catch (e) {
+    throw new Error(`网络请求失败：${e && e.message ? e.message : e}`);
+  }
+  if (!resp.ok) {
+    const body = (await resp.text()).slice(0, 300);
+    throw new Error(`HTTP ${resp.status} ${ERROR_HINTS[resp.status] || ''}\n${body}`);
+  }
+  return resp.json();
+}
+const getMe = (token) => apiCall('GET', '/v1/me', token);
+
+const SHORT_HOSTS = ['b23.tv', 'xhslink.cn', 'v.douyin.com', 'youtu.be', 't.cn', 'dwz.cn', 'url.cn'];
+function isShortLink(url) {
+  try {
+    const h = new URL(url).hostname.toLowerCase();
+    return SHORT_HOSTS.some((s) => h === s || h.endsWith(`.${s}`));
+  } catch { return false; }
+}
+async function expandUrl(token, url) {
+  try {
+    const d = await apiCall('GET', '/v1/expandUrl', token, { params: { url } });
+    return typeof d?.url === 'string' && /^https?:\/\//.test(d.url) ? d.url : url;
+  } catch { return url; }
+}
+
+const CARD_PROMPT = `请把这条音视频内容整理成知识卡片，严格输出JSON，不要用markdown代码块包裹，不要输出其他多余文字。字段：
+{"title":"不超过20字的标题","domain":"所属领域，如职场成长/AI与效率/心理/科技/学习/生活/音乐/商业/其他","tldr":"一句话精华不超过40字","points":["核心要点1","核心要点2"],（3到5条每条不超30字）"tags":["标签"],（3到5个）"verdict":"建议回看 或 摘要足够","verdictReason":"不超过40字的理由"}`;
+
+const CARD_MODE_INFO = {
+  1: { label: '单次 · 智能卡', desc: '一次调用直接产出结构化卡片，省额度、速度快（推荐）' },
+  2: { label: '单次 · 简洁卡', desc: '默认总结 + 本地解析，卡片从简，保留原始总结全文' },
+  3: { label: '两次 · 精制卡', desc: '先总结再由 AI 精修成卡片，两次调用、内容更打磨' },
+};
+
+function parseCardJson(text) {
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start < 0 || end <= start) return null;
+  try { return JSON.parse(text.slice(start, end + 1)); } catch { return null; }
+}
+const stripMd = (s) => String(s).replace(/[*_`>#]/g, '').replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').trim();
+const toArr = (x, max) => Array.isArray(x) ? x.map((v) => stripMd(String(v))).filter(Boolean).slice(0, max) : [];
+
+function guessDomain(title, tags, corpus) {
+  const text = `${title} ${tags.join(' ')} ${corpus.slice(0, 400)}`;
+  const rules = [
+    ['AI与效率', /AI|人工智能|大模型|GPT|提示词|效率工具/i],
+    ['职场成长', /职场|汇报|老板|面试|简历|管理|沟通/],
+    ['心理', /心理|焦虑|情绪|拖延|习惯|认知/],
+    ['音乐', /音乐|歌曲|编曲|混音|歌单|乐器/],
+    ['科技', /编程|代码|开发|算法|数码|开源/],
+    ['商业', /商业|创业|投资|经济|市场|金融/],
+    ['学习', /学习|考试|读书|英语|笔记|教程/],
+    ['健康', /健康|健身|运动|养生|饮食/],
+    ['生活', /美食|旅行|生活|vlog|穿搭/i],
+  ];
+  for (const [name, re] of rules) if (re.test(text)) return name;
+  return '其他';
+}
+function normalizeCardShape(j, fallbackTitle) {
+  const domain = stripMd(j.domain || '') || guessDomain('', [], '');
+  return {
+    title: stripMd(j.title || '').slice(0, 24) || fallbackTitle,
+    domain,
+    tldr: stripMd(j.tldr || '') || '暂无一句话精华',
+    points: toArr(j.points, 5),
+    tags: toArr(j.tags, 5).map((t) => t.replace(/^#/, '')),
+    verdict: j.verdict === '建议回看' ? '建议回看' : '摘要足够',
+    verdictReason: stripMd(j.verdictReason || '') || '按摘要浏览即可掌握大意。',
+  };
+}
+function parseMarkdownCard(raw, fallbackTitle) {
+  const section = (name) => {
+    const m = raw.match(new RegExp(`##\\s*${name}\\s*\\n([\\s\\S]*?)(?=\\n##|$)`));
+    return m ? m[1].trim() : '';
+  };
+  const tldrRaw = (section('摘要').split('\n').find((l) => l.trim())) || '';
+  const points = section('亮点').split('\n')
+    .filter((l) => /^\s*[-*•]\s+/.test(l))
+    .map((l) => stripMd(l.replace(/^\s*[-*•]\s+/, '')))
+    .filter(Boolean).slice(0, 5);
+  const tags = (raw.match(/#\s*[^\s#，。,、]{1,12}/g) || [])
+    .map((t) => stripMd(t)).filter((t) => t && !/^(摘要|亮点|思考|术语)/.test(t)).slice(0, 5);
+  const domain = guessDomain(fallbackTitle, tags, raw);
+  const density = points.length;
+  return {
+    title: fallbackTitle, domain,
+    tldr: stripMd(tldrRaw).slice(0, 80) || '暂无一句话精华',
+    points: points.length ? points : [stripMd(tldrRaw) || '见原始总结'],
+    tags: tags.length ? tags : [domain],
+    verdict: density >= 3 ? '建议回看' : '摘要足够',
+    verdictReason: density >= 3 ? '要点较密集，建议晚间花 3 分钟过一遍更划算。' : '信息密度不高，浏览摘要即可掌握大意。',
+  };
+}
+
+let seq = 0;
+const newId = () => `${Date.now().toString(36)}_${(seq++).toString(36)}${Math.floor(Math.random() * 36).toString(36)}`;
+
+async function summarizeDefault(token, url) {
+  const d = await apiCall('GET', '/v1/summarize', token, { params: { url, includeDetail: 'true' } });
+  if (!d?.success) throw new Error('总结失败：' + JSON.stringify(d).slice(0, 300));
+  return {
+    raw: d.summary || '',
+    meta: { fallbackTitle: d.detail?.title || url, author: d.detail?.author, durationSec: d.detail?.duration, dbId: d.detail?.dbId, sourceUrl: d.sourceUrl || url },
+  };
+}
+function finishCard(shape, meta, raw, mode) {
+  return { id: newId(), createdAt: Date.now(), url: meta.sourceUrl, ...shape,
+    durationSec: meta.durationSec, author: meta.author, rawSummary: raw, stored: false, mode };
+}
+async function createCard(token, url, mode) {
+  if (mode === 1) {
+    const d = await apiCall('POST', '/v1/summarizeWithConfig', token, {
+      body: { url, includeDetail: true, promptConfig: { customPrompt: CARD_PROMPT, isRefresh: true, outputLanguage: 'zh-CN' } },
+    });
+    if (!d?.success) throw new Error('总结失败：' + JSON.stringify(d).slice(0, 300));
+    const meta = { fallbackTitle: d.detail?.title || url, author: d.detail?.author, durationSec: d.detail?.duration, sourceUrl: d.sourceUrl || url };
+    const j = parseCardJson(d.summary || '');
+    const shape = j ? normalizeCardShape(j, meta.fallbackTitle) : parseMarkdownCard(d.summary || '', meta.fallbackTitle);
+    return finishCard(shape, meta, d.summary, mode);
+  }
+  if (mode === 2) {
+    const { raw, meta } = await summarizeDefault(token, url);
+    return finishCard(parseMarkdownCard(raw, meta.fallbackTitle), meta, raw, mode);
+  }
+  const { raw, meta } = await summarizeDefault(token, url);
+  if (!meta.dbId) throw new Error('未取得内容 ID，无法精制');
+  const d2 = await apiCall('POST', '/v1/summary/byPrompt', token, { body: { contentId: meta.dbId, customPrompt: CARD_PROMPT, outputLanguage: 'zh-CN' } });
+  const refined = d2?.summary || '';
+  if (!refined) throw new Error('精制失败：' + JSON.stringify(d2).slice(0, 300));
+  const j = parseCardJson(refined);
+  const shape = j ? normalizeCardShape(j, meta.fallbackTitle) : parseMarkdownCard(raw, meta.fallbackTitle);
+  return finishCard(shape, meta, raw, mode);
+}
+
+/* ========================= 去重 / 链接提取 ========================= */
+function contentKey(rawUrl) {
+  let u;
+  try { u = new URL(/^https?:\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`); } catch { return null; }
+  const host = u.hostname.toLowerCase().replace(/^(www\.|m\.)/, '');
+  let path = u.pathname.replace(/\/+$/, '');
+  if (host === 'bilibili.com' || host === 'b23.tv') {
+    const bv = path.match(/\/(BV[0-9A-Za-z]{10})/i);
+    return bv ? `bili:${bv[1]}` : `bili:${host}${path}`;
+  }
+  if (host === 'youtube.com') {
+    const v = u.searchParams.get('v');
+    if (v) return `yt:${v}`;
+    const s = path.match(/^\/shorts\/([^/?]+)/);
+    if (s) return `yt:${s[1]}`;
+    return `yt:${path}`;
+  }
+  if (host === 'youtu.be') return `yt:${path.replace(/^\//, '')}`;
+  const SHORT = ['xhslink.cn', 'v.douyin.com', 't.cn', 'dwz.cn', 'url.cn'];
+  if (SHORT.some((s) => host === s || host.endsWith(`.${s}`))) return `short:${host}${path}`;
+  const keep = [];
+  u.searchParams.forEach((v, k) => { if (!/^(utm_|spm|vd_source|feature|si|igsh|x-)/i.test(k)) keep.push(`${k}=${v}`); });
+  keep.sort();
+  return `u:${host}${path}${keep.length ? `?${keep.join('&')}` : ''}`;
+}
+function extractUrl(text) {
+  const m = text.match(/https?:\/\/[\x21-\x7e]+/i);
+  if (!m) return null;
+  return m[0].replace(/[.,;:!?)\]}'">，。；！？）》」』~…]+$/, '') || null;
+}
+
+/* ========================= 本地存储 ========================= */
+const KEYS = { cards: 'shizhi_web_cards', settings: 'shizhi_web_settings' };
+const DEFAULT_SETTINGS = { token: '', cardMode: 1, onboarded: false };
+function loadState() {
+  let cards = [], settings = DEFAULT_SETTINGS;
+  try { cards = JSON.parse(localStorage.getItem(KEYS.cards) || '[]'); } catch {}
+  try { settings = { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(KEYS.settings) || '{}') }; } catch {}
+  return { cards, settings };
+}
+function persist() {
+  localStorage.setItem(KEYS.cards, JSON.stringify(state.cards));
+  localStorage.setItem(KEYS.settings, JSON.stringify(state.settings));
+}
+
+let state = loadState();
+let screen = 'home'; // home | tree | me | detail
+let detailId = null;
+let detailFrom = 'home';
+let onboardingOpen = !state.settings.onboarded;
+let onboardingVerify = { kind: 'idle' };
+
+function setSettings(patch) { state.settings = { ...state.settings, ...patch }; persist(); }
+function addCard(card) {
+  const key = contentKey(card.url);
+  if (key) {
+    const existing = state.cards.find((c) => contentKey(c.url) === key);
+    if (existing) return { added: false, existing };
+  }
+  state.cards = [card, ...state.cards];
+  persist();
+  return { added: true, existing: null };
+}
+function hasDuplicate(url) {
+  const key = contentKey(url);
+  if (!key) return null;
+  return state.cards.find((c) => contentKey(c.url) === key) || null;
+}
+function todayStr(d = new Date()) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+const todayCards = (cards) => cards.filter((c) => todayStr(new Date(c.createdAt)) === todayStr());
+
+/* ========================= 小工具：toast / 转义 ========================= */
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+const fmtDur = (sec) => sec ? `${Math.floor(sec/60)}:${String(Math.floor(sec%60)).padStart(2,'0')}` : '';
+
+/* ========================= 渲染 ========================= */
+function render() {
+  const app = document.getElementById('app');
+  let html = '';
+  if (screen === 'detail') html = renderDetail();
+  else if (screen === 'tree') html = renderTree();
+  else if (screen === 'me') html = renderMe();
+  else html = renderHome();
+
+  const tabs = ['home', 'tree', 'me'];
+  const tabInfo = { home: ['🏠', '首页'], tree: ['🌳', '知识树'], me: ['🙂', '我的'] };
+  const activeTab = screen === 'detail' ? detailFrom : screen;
+  const tabbar = `<div class="tabbar">${tabs.map((t) => `
+    <button class="tabbtn ${activeTab === t ? 'on' : ''}" data-go="${t}">
+      <span class="ic">${tabInfo[t][0]}</span>${tabInfo[t][1]}
+    </button>`).join('')}</div>`;
+
+  app.innerHTML = html + tabbar + (onboardingOpen ? renderOnboarding() : '');
+  bindEvents();
+}
+
+function renderHome() {
+  const today = todayCards(state.cards);
+  const digestRate = state.cards.length ? Math.round((state.cards.filter((c) => c.stored).length / state.cards.length) * 100) : 0;
+  const list = state.cards.slice(0, 20).map((c) => `
+    <div class="mini" data-open="${c.id}">
+      <div class="miniCov">${cardEmoji(c.domain)}</div>
+      <div class="miniBody">
+        <div class="miniT">${esc(c.title)}</div>
+        <div class="miniSub">${esc(c.domain)}${c.durationSec ? ` · ${Math.round(c.durationSec/60)} 分钟` : ''}</div>
+      </div>
+      <div class="tag ${c.stored ? 'tagMuted' : 'tagGold'}">${c.stored ? '已入树' : esc(c.verdict)}</div>
+    </div>`).join('');
+  return `
+    <div class="appbar"><h1>拾知</h1><span class="sub"> · 短视频知识寄存</span><div class="spacer"></div>
+      <span class="modeTag">${CARD_MODE_INFO[state.settings.cardMode].label}</span>
+    </div>
+    <div class="body">
+      <div class="card hero">
+        <h2>把刷到的知识，寄存在这里</h2>
+        <p>粘贴 B 站/YouTube/文件直链，AI 帮你提炼、归类。真实调用你自己的 BibiGPT API Token。</p>
+        <div class="linkRow">
+          <input id="linkInput" class="linkbox" placeholder="粘贴链接，或整段分享文案（自动提取链接）" autocomplete="off" />
+          <button class="pasteBtn" id="pasteHome">📋 粘贴</button>
+        </div>
+        <button class="btnPrimary" id="parseBtn">粘贴链接，AI 解析成卡</button>
+      </div>
+      <div class="stats">
+        <div class="chip"><b>${today.length}</b><span>今日收集</span></div>
+        <div class="chip"><b>${state.cards.length}</b><span>累计知识</span></div>
+        <div class="chip"><b>${digestRate}%</b><span>消化率</span></div>
+      </div>
+      <div class="secRow"><div class="secBar"></div><div class="sec">最近收集</div></div>
+      ${state.cards.length === 0 ? `<div class="empty">还没有收藏，从上方解析第一条视频开始 🌱</div>` : list}
+    </div>`;
+}
+
+function renderDetail() {
+  const card = state.cards.find((c) => c.id === detailId);
+  if (!card) {
+    return `<div class="appbar"><span class="back" data-go="home">‹</span><h1>知识卡片</h1></div>
+      <div class="body"><div class="empty">卡片不存在或已删除</div></div>`;
+  }
+  const meta = [card.domain, fmtDur(card.durationSec), card.author ? `@${card.author}` : ''].filter(Boolean).join(' · ');
+  return `
+    <div class="appbar"><span class="back" data-go="${detailFrom}">‹</span><h1>知识卡片</h1></div>
+    <div class="body">
+      <div class="cov"><div class="em">${cardEmoji(card.domain)}</div><div class="t">${esc(card.title)}</div><div class="m">${esc(meta)}</div></div>
+      <div class="verdict" style="border-color:${card.verdict === '建议回看' ? 'var(--gold)' : 'var(--tealL)'}">
+        <b style="color:${card.verdict === '建议回看' ? 'var(--gold)' : 'var(--greenM)'}">${card.verdict}</b>
+        <span>${esc(card.verdictReason)}</span>
+      </div>
+      <div class="card"><div class="ctRow"><div class="ctBar" style="background:var(--gold)"></div><div class="ct">一句话精华</div></div><div class="tl">${esc(card.tldr)}</div></div>
+      <div class="card"><div class="ctRow"><div class="ctBar"></div><div class="ct">核心要点</div></div>
+        ${card.points.map((p) => `<div class="ptRow"><div class="dot"></div><div class="pt">${esc(p)}</div></div>`).join('')}
+      </div>
+      <div class="card"><div class="ctRow"><div class="ctBar"></div><div class="ct">智能标签</div></div>
+        <div class="tags">${card.tags.map((t) => `<span class="tagChip">${esc(t)}</span>`).join('')}</div>
+      </div>
+      <div class="acts">
+        <button class="btnLine" data-store="${card.id}" data-val="${card.stored ? '0' : '1'}">${card.stored ? '移出知识树' : '存入知识树'}</button>
+        <button class="btnLine" data-openurl="${esc(card.url)}">回看原视频</button>
+      </div>
+      <div class="deleteBtn" data-del="${card.id}">删除这张卡片</div>
+      ${card.rawSummary ? `<div class="card"><div class="ctRow"><div class="ctBar" style="background:var(--tealL)"></div><div class="ct">原始总结</div></div><div class="tl" style="font-size:12.5px;color:var(--muted)">${esc(card.rawSummary)}</div></div>` : ''}
+    </div>`;
+}
+
+function renderTree() {
+  const stored = state.cards.filter((c) => c.stored);
+  const groups = {};
+  stored.forEach((c) => { (groups[c.domain] ||= []).push(c); });
+  const domains = Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length);
+  const body = domains.length ? domains.map((d) => `
+    <div class="secRow"><div class="secBar"></div><div class="sec">${cardEmoji(d)} ${esc(d)} · ${groups[d].length}</div></div>
+    ${groups[d].map((c) => `
+      <div class="mini" data-open="${c.id}">
+        <div class="miniCov">${cardEmoji(c.domain)}</div>
+        <div class="miniBody"><div class="miniT">${esc(c.title)}</div><div class="miniSub">${esc(c.tldr)}</div></div>
+      </div>`).join('')}
+  `).join('') : `<div class="empty">还没有存入知识树的卡片 🌳<br/>在卡片详情页点「存入知识树」即可归档</div>`;
+  return `
+    <div class="appbar"><h1>知识树</h1></div>
+    <div class="body">${body}</div>`;
+}
+
+function renderMe() {
+  const cards = state.cards;
+  const domains = new Set(cards.filter((c) => c.stored).map((c) => c.domain)).size;
+  const weekAgo = Date.now() - 7 * 86400000;
+  const weekDigested = cards.filter((c) => c.stored && c.createdAt > weekAgo).length;
+  const modeUI = [1, 2, 3].map((m) => `
+    <div class="modeItem ${state.settings.cardMode === m ? 'on' : ''}" data-mode="${m}">
+      <div class="radio ${state.settings.cardMode === m ? 'on' : ''}"></div>
+      <div><div class="modeLabel" style="${state.settings.cardMode === m ? 'color:var(--greenM)' : ''}">${CARD_MODE_INFO[m].label}</div>
+      <div class="modeDesc">${CARD_MODE_INFO[m].desc}</div></div>
+    </div>`).join('');
+  return `
+    <div class="appbar"><h1>我的</h1></div>
+    <div class="body">
+      <div class="set">
+        <div class="setTitle">BibiGPT API Token</div>
+        <input id="tokenInput" class="inputBox" type="password" value="${esc(state.settings.token)}" placeholder="bibigpt.co/user/integration 获取，自动保存" autocomplete="off" />
+        <div style="padding:0 16px 12px"><span class="linkText" id="reonboard">🔁 重新运行接入引导（含 Token 获取教程与验证）</span></div>
+      </div>
+      <div class="set">
+        <div class="setTitle">制卡模式（可自由切换对比效果）</div>
+        ${modeUI}
+      </div>
+      <div class="set">
+        <div class="row"><div class="rl">累计知识</div><div class="riStrong">${cards.length} 条</div></div>
+        <div class="row"><div class="rl">本周消化</div><div class="riStrong">${weekDigested} 条</div></div>
+        <div class="row"><div class="rl">知识树领域</div><div class="ri">${domains} 个</div></div>
+      </div>
+      <div class="set">
+        <div class="row" id="clearAll" style="cursor:pointer"><div class="rl" style="color:#b34a4a">清空数据</div><div class="ri">›</div></div>
+        <div class="row"><div class="rl">关于拾知</div><div class="ri">v1.0 · 网页版</div></div>
+      </div>
+    </div>`;
+}
+
+function renderOnboarding() {
+  const v = onboardingVerify;
+  return `
+  <div class="overlay"><div class="onbWrap">
+    <div class="onbEmoji">🌱</div>
+    <div class="onbTitle">欢迎使用拾知</div>
+    <div class="onbSub">拾知通过 BibiGPT 开放 API 把短视频解析成知识卡片。接入你自己的 API Token 即可开始使用——Token 是 BibiGPT 分配给你账号的一串密钥，解析时长从你的账号额度扣除。本页为纯前端网页版，Token 只保存在你浏览器本地，不会上传到任何第三方服务器。</div>
+    <div class="card">
+      <div class="step">第 1 步 · 获取 Token</div>
+      <a class="btnGhost" href="${TOKEN_PAGE}" target="_blank" rel="noopener">🔗 去 BibiGPT 获取 Token</a>
+      <div class="hint">在打开的页面登录/注册 BibiGPT，复制你的 API Token 后回到这里</div>
+
+      <div class="step">第 2 步 · 粘贴 Token</div>
+      <div class="linkRow">
+        <input id="onbToken" class="linkbox" placeholder="粘贴你的 Token" autocomplete="off" />
+        <button class="pasteBtn" id="pasteOnb">📋 粘贴</button>
+      </div>
+
+      <div class="step">第 3 步 · 验证</div>
+      <button class="btnPrimary" id="verifyBtn" ${v.kind === 'checking' ? 'disabled' : ''}>
+        ${v.kind === 'checking' ? '<span class="spin"></span>验证中…' : '验证连接'}
+      </button>
+
+      ${v.kind === 'ok' ? `
+        <div class="okBox">
+          <div class="okText">✅ 连接成功${v.email ? `（${esc(v.email)}）` : ''}<br/>剩余额度约 ${v.minutes} 分钟 · 套餐 ${esc(v.tier)}</div>
+          <button class="btnPrimary" id="enterBtn">进入拾知 →</button>
+        </div>` : ''}
+      ${v.kind === 'fail' ? `<div class="failText">❌ Token 无效，请检查是否复制完整<br/>${esc(v.message)}</div>` : ''}
+    </div>
+    <div class="skip" id="skipOnb">稍后再说，先随便逛逛 →</div>
+  </div></div>`;
+}
+
+/* ========================= 事件绑定（每次 render 后重绑） ========================= */
+function bindEvents() {
+  document.querySelectorAll('[data-go]').forEach((el) => el.onclick = () => {
+    screen = el.dataset.go; render();
+  });
+  document.querySelectorAll('[data-open]').forEach((el) => el.onclick = () => {
+    detailFrom = screen === 'detail' ? detailFrom : screen;
+    detailId = el.dataset.open; screen = 'detail'; render();
+  });
+  const delBtn = document.querySelector('[data-del]');
+  if (delBtn) delBtn.onclick = () => {
+    if (!confirm('彻底删除这张卡片？卡片及其原始总结将从本机移除，不可恢复。')) return;
+    const id = delBtn.dataset.del;
+    state.cards = state.cards.filter((c) => c.id !== id);
+    persist();
+    screen = detailFrom || 'home';
+    toast('卡片已删除');
+    render();
+  };
+  const storeBtn = document.querySelector('[data-store]');
+  if (storeBtn) storeBtn.onclick = () => {
+    const id = storeBtn.dataset.store;
+    const val = storeBtn.dataset.val === '1';
+    if (!val && !confirm('移出知识树？卡片仍保留在首页收藏中，可随时重新存入。')) return;
+    state.cards = state.cards.map((c) => c.id === id ? { ...c, stored: val } : c);
+    persist();
+    toast(val ? '已归入知识树 🌳' : '已从知识树移除');
+    if (val) { screen = 'tree'; }
+    render();
+  };
+  const openUrlBtn = document.querySelector('[data-openurl]');
+  if (openUrlBtn) openUrlBtn.onclick = () => window.open(openUrlBtn.dataset.openurl, '_blank');
+
+  const parseBtn = document.getElementById('parseBtn');
+  if (parseBtn) parseBtn.onclick = doParse;
+  const pasteHome = document.getElementById('pasteHome');
+  if (pasteHome) pasteHome.onclick = async () => {
+    try {
+      const text = (await navigator.clipboard.readText()).trim();
+      if (text) document.getElementById('linkInput').value = text;
+    } catch { toast('无法读取剪贴板，请手动粘贴'); }
+  };
+
+  document.querySelectorAll('[data-mode]').forEach((el) => el.onclick = () => {
+    const m = Number(el.dataset.mode);
+    setSettings({ cardMode: m });
+    toast(`制卡模式已切换：${CARD_MODE_INFO[m].label}`);
+    render();
+  });
+  const tokenInput = document.getElementById('tokenInput');
+  if (tokenInput) tokenInput.onchange = () => { setSettings({ token: tokenInput.value.trim() }); toast('Token 已保存'); };
+  const reonboard = document.getElementById('reonboard');
+  if (reonboard) reonboard.onclick = () => { onboardingVerify = { kind: 'idle' }; onboardingOpen = true; render(); };
+  const clearAll = document.getElementById('clearAll');
+  if (clearAll) clearAll.onclick = () => {
+    if (!confirm('清空全部数据？将删除所有知识卡片（Token 保留）')) return;
+    state.cards = []; persist(); toast('已清空'); render();
+  };
+
+  const verifyBtn = document.getElementById('verifyBtn');
+  if (verifyBtn) verifyBtn.onclick = doVerify;
+  const pasteOnb = document.getElementById('pasteOnb');
+  if (pasteOnb) pasteOnb.onclick = async () => {
+    try {
+      const text = (await navigator.clipboard.readText()).trim();
+      if (text) { document.getElementById('onbToken').value = text; onboardingVerify = { kind: 'idle' }; }
+    } catch { toast('无法读取剪贴板，请手动粘贴'); }
+  };
+  const enterBtn = document.getElementById('enterBtn');
+  if (enterBtn) enterBtn.onclick = () => { setSettings({ onboarded: true }); onboardingOpen = false; render(); };
+  const skipOnb = document.getElementById('skipOnb');
+  if (skipOnb) skipOnb.onclick = () => { setSettings({ onboarded: true }); onboardingOpen = false; render(); };
+}
+
+async function doVerify() {
+  const input = document.getElementById('onbToken');
+  const t = input.value.trim();
+  if (!t) { onboardingVerify = { kind: 'fail', message: '请先粘贴 Token' }; render(); return; }
+  onboardingVerify = { kind: 'checking' }; render();
+  try {
+    const me = await getMe(t);
+    setSettings({ token: t });
+    onboardingVerify = { kind: 'ok', email: me?.email ?? null, tier: me?.plan?.tier ?? 'free', minutes: Math.round(me?.remainingMinutes ?? 0) };
+  } catch (e) {
+    onboardingVerify = { kind: 'fail', message: e?.message ?? '验证失败' };
+  }
+  render();
+}
+
+async function doParse() {
+  const input = document.getElementById('linkInput');
+  const raw = input.value;
+  const link = extractUrl(raw);
+  if (!link) { toast('没有识别到链接，请检查后重试'); return; }
+  if (link !== raw.trim()) { input.value = link; toast('已从分享文案中提取链接'); }
+
+  const dup = hasDuplicate(link);
+  if (dup) { toast('这条内容已经收过啦，直接打开它 📌'); detailFrom = 'home'; detailId = dup.id; screen = 'detail'; render(); return; }
+
+  if (!state.settings.token.trim()) {
+    if (confirm('缺少 API Token，请先到「我的」页填写 BibiGPT Token。是否现在去填写？')) { screen = 'me'; render(); }
+    return;
+  }
+
+  const parseBtn = document.getElementById('parseBtn');
+  const setBusy = (stage) => { parseBtn.disabled = true; parseBtn.innerHTML = `<span class="spin"></span>${esc(stage || '处理中…')}`; };
+  setBusy('处理中…');
+  try {
+    let finalUrl = link;
+    const token = state.settings.token.trim();
+    if (isShortLink(link)) {
+      setBusy('检测到短链，正在展开…');
+      const expanded = await expandUrl(token, link);
+      if (expanded !== link) {
+        finalUrl = expanded; input.value = expanded; toast('短链已展开');
+      }
+      const dup2 = hasDuplicate(finalUrl);
+      if (dup2) { toast('这条内容已经收过啦，直接打开它 📌'); detailFrom = 'home'; detailId = dup2.id; screen = 'detail'; render(); return; }
+    }
+    setBusy('AI 解析视频内容…');
+    const card = await createCard(token, finalUrl, state.settings.cardMode);
+    setBusy('生成知识卡片…');
+    const res = addCard(card);
+    if (!res.added && res.existing) {
+      toast('内容重复，已为你打开原有卡片 📌');
+      detailFrom = 'home'; detailId = res.existing.id; screen = 'detail'; render(); return;
+    }
+    input.value = '';
+    detailFrom = 'home'; detailId = card.id; screen = 'detail';
+    render();
+  } catch (e) {
+    alert('解析失败\n' + (e?.message ?? String(e)));
+    render();
+  }
+}
+
+render();
+</script>
+</body>
+</html>
